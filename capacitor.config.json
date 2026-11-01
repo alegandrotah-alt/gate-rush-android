@@ -1,0 +1,12 @@
+{
+  "appId": "com.gaterush.game",
+  "appName": "Gate Rush",
+  "webDir": "www",
+  "backgroundColor": "#05070c",
+  "android": {
+    "backgroundColor": "#05070c",
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}

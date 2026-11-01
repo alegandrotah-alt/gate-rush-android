@@ -1,0 +1,17 @@
+{
+  "name": "gate-rush-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gate Rush packaged as an Android app with Capacitor",
+  "scripts": {
+    "setup:android": "npx cap add android && npx cap sync android && python3 tools/android_setup.py",
+    "sync": "npx cap sync android && python3 tools/android_setup.py"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}
