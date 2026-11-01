@@ -5,9 +5,10 @@ GitHub Actions builds an installable APK on every push to `main`.
 
 ## Getting the APK
 
-1. Open the **Actions** tab and click the latest **Build Android APK** run.
-2. When it has a green tick, download **gate-rush-apk** under *Artifacts* and unzip it.
-3. Copy `GateRush-<number>.apk` to your phone and open it. Allow "Install unknown apps" for the app you opened it with when Android asks.
+On your phone, open this repository's **Releases** page (the latest release is at the top) and tap `GateRush-<number>.apk`.
+Open the downloaded file and allow "Install unknown apps" when Android asks.
+
+Every build is also attached to its run in the **Actions** tab as **gate-rush-apk** (a zip containing the APK).
 
 Each build has a higher version number, so a new APK installs over the old one and keeps your saves.
 
