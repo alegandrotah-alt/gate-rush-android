@@ -12,6 +12,14 @@ Every build is also attached to its run in the **Actions** tab as **gate-rush-ap
 
 Each build has a higher version number, so a new APK installs over the old one and keeps your saves.
 
+## Play on iPhone, iPad or any browser
+
+The same game is published as a web app with GitHub Pages: https://alegandrotah-alt.github.io/gate-rush-android/
+
+On iPhone or iPad, open that link in **Safari**, tap **Share → Add to Home Screen**, then start it from the new icon.
+It runs full screen, works offline after the first visit, and keeps saves on the device.
+The **Publish web version** workflow updates it on every push to `main`.
+
 ## What's inside
 
 - `www/` is the game: `index.html` plus the pre-rendered 3D sprite sheets in `www/gfx3d/`.
