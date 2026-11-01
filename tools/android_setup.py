@@ -91,4 +91,22 @@ if run:
     t = re.sub(r'versionCode \d+', 'versionCode %d' % int(run), t)
     t = re.sub(r'versionName "[^"]*"', 'versionName "1.0.%s"' % run, t)
     open(g, 'w', encoding='utf-8').write(t)
+# release signing with your own key (set up through the repository's Actions secrets)
+if os.environ.get('KEYSTORE_FILE'):
+    g = os.path.join(AND, 'build.gradle')
+    t = open(g, encoding='utf-8').read()
+    if 'signingConfigs' not in t:
+        sign = '''signingConfigs {
+        release {
+            storeFile file(System.getenv("KEYSTORE_FILE"))
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEYSTORE_PASSWORD")
+        }
+    }
+    buildTypes {'''
+        t = t.replace('buildTypes {', sign, 1)
+        t = re.sub(r'(buildTypes \{\s*release \{)', r'\1\n            signingConfig signingConfigs.release', t, count=1)
+        open(g, 'w', encoding='utf-8').write(t)
+        print('release signing configured')
 print('android project customised')

@@ -32,26 +32,41 @@ jobs:
       - name: Bundle fonts for offline play
         run: python3 tools/fetch_fonts.py
 
+      - name: Load the signing key
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+            echo "Signing key loaded"
+          fi
+
       - name: Generate and customise the Android project
         run: |
           npx cap add android
           npx cap sync android
           python3 tools/android_setup.py
 
-      - name: Build debug APK
+      - name: Build APK (signed release if the signing secrets are set, otherwise debug)
         working-directory: android
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
-
-      - name: Rename APK
-        run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk GateRush-${{ github.run_number }}.apk
-          ls -la GateRush-*.apk
+          if [ -n "$KEYSTORE_FILE" ]; then
+            ./gradlew assembleRelease --no-daemon
+            cp app/build/outputs/apk/release/app-release.apk ../GateRush-${{ github.run_number }}.apk
+          else
+            echo "::warning::No signing secrets set, building a debug APK. Updates may need an uninstall first."
+            ./gradlew assembleDebug --no-daemon
+            cp app/build/outputs/apk/debug/app-debug.apk ../GateRush-${{ github.run_number }}.apk
+          fi
+          ls -la ../GateRush-*.apk
 
       - name: Publish to Releases (direct download link for your phone)
         env:
