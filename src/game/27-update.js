@@ -118,7 +118,7 @@ function update(dt){
     const dx=b.x-c.x,dy=b.y-c.y,d2=dx*dx+dy*dy,rr=b.r+hit;
     if(b.vy>0&&!b.home)for(const g of S.lv.gates){if(g.dead||!isHeld(g)||g.own<0)continue;const gy=g.y-13;if(b.y-b.vy*dt*bslow<gy&&b.y>=gy){const o=gateX(g);if(b.x>=g.x1+o&&b.x<=g.x2+o){b.life=0;gateCtl(g,-(b.hard?.024:.012)*(1+.03*S.L),b.x);g.flash=Math.max(g.flash,.08);break}}}
     if(b.life<=0)continue;
-    if(d2<rr*rr&&c.inv<=0){hitPlayer(b.dmg);b.life=0;continue}
+    if(d2<rr*rr&&c.inv<=0){hitPlayer(b.dmg,b.home?'missile':b.hard?'ringed':'bullet');b.life=0;continue}
     if(lim('graze')&&!b.gz&&d2<(rr+18)*(rr+18)){b.gz=1;S.gz=Math.min(1.2,S.gz+.03);c.charge=Math.min(1,c.charge+.012)}
   }
   // blobs block soft bullets one for one; outlined (hard) bullets pass straight through your stream
@@ -130,11 +130,11 @@ function update(dt){
         S.blk=(S.blk||0)+1;if(b.hp>1){b.hp--;}else{b.life=0;if(Math.random()<.4)spark(b.x,b.y,'#8fe7ff',2)}
         if(u.big)u.w*=.97;else{u.w=0;break}}}}}}
   // lasers
-  for(const l of S.lasers){l.t+=dt;if(l.t>l.warn&&l.t<l.warn+l.dur&&Math.abs(c.x-l.x)<l.w/2+hit&&c.y>(l.y0??S.fy))hitPlayer(bulletDmg()*1.8)}
+  for(const l of S.lasers){l.t+=dt;if(l.t>l.warn&&l.t<l.warn+l.dur&&Math.abs(c.x-l.x)<l.w/2+hit&&c.y>(l.y0??S.fy))hitPlayer(bulletDmg()*1.8,'laser')}
   S.lasers=S.lasers.filter(l=>l.t<l.warn+l.dur);
   // mortar shells
   for(const a of S.arts){a.t+=dt;if(a.t>=a.dur&&!a.done){a.done=true;S.booms.push({x:a.x,y:a.y,r:34,life:.35});blip(55,.25,'sawtooth',.07);
-    if(Math.hypot(c.x-a.x,c.y-a.y)<30+hit*.5)hitPlayer(bulletDmg()*1.6);
+    if(Math.hypot(c.x-a.x,c.y-a.y)<30+hit*.5)hitPlayer(bulletDmg()*1.6,'mortar');
     for(const u of S.players)if(Math.hypot(u.x-a.x,u.y-a.y)<34)u.w=0}}
   S.arts=S.arts.filter(a=>!a.done);
 
@@ -162,8 +162,8 @@ function update(dt){
       else if(g.t==='mul'&&!e.brute){const v=Math.min(gateMul(g),6),n=Math.min(v,3);e.w=e.w*v/n;e.max=Math.max(e.max,e.w);for(let j=1;j<n&&S.enemies.length<E_CAP;j++){const c2=spawnEnemy(e.x+(j-1)*8,e.y+4,e.w,false,'');if(c2){c2.gm=e.gm;c2.child=1}}g.flash=.15}}}
     if(wall&&e.y<wall.y2+r&&e.y>wall.y1-r){if(e.x<wall.x)e.x=Math.min(e.x,wall.x-3-r);else e.x=Math.max(e.x,wall.x+3+r)}
     e.x=clamp(e.x,26+r,374-r);
-    if(Math.hypot(e.x-c.x,e.y-c.y)<r+hit+2){hitPlayer(bulletDmg()*(e.brute?2:e.t==='runner'?.8:.6));if(!e.brute){spark(e.x,e.y,'#ff5050',5);if(e.t==='bomber')foeDies(e);e.w=0}}
-    if(e.y>DEF_Y){hitPlayer(bulletDmg()*.5);e.w=0}
+    if(Math.hypot(e.x-c.x,e.y-c.y)<r+hit+2){hitPlayer(bulletDmg()*(e.brute?2:e.t==='runner'?.8:.6),e.brute?'brute':'crash');if(!e.brute){spark(e.x,e.y,'#ff5050',5);if(e.t==='bomber')foeDies(e);e.w=0}}
+    if(e.y>DEF_Y){hitPlayer(bulletDmg()*.5,'leak');e.w=0}
     if(e.brute&&S.L>=5&&e.w>0){e.shotT-=dt;if(e.shotT<=0){e.shotT=2.4;const a=aimAt(e.x,e.y);addBullet(e.x,e.y,Math.cos(a)*150,Math.sin(a)*150,{col:1})}}
   }
 

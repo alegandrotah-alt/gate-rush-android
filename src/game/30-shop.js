@@ -89,6 +89,7 @@ function runOver(quit){
   const vs=document.createElement('span');vs.style.background='#fff';vs.textContent=VEH[R.veh].name;bl.appendChild(vs);
   for(const id of R.relics){const sp=document.createElement('span');sp.style.background=TIERC[relicTierOf(id,has(id))];sp.textContent=relicName(id,has(id));bl.appendChild(sp)}
   for(const [id,l] of Object.entries(R.ups)){const u=UPNAME[id];const sp=document.createElement('span');sp.style.background=CATC[u.cat];sp.textContent=u.cat==='evo'||u.cat==='lim'?u.name:`${u.name} ${l}`;bl.appendChild(sp)}
+  {const hl=Object.entries(R.hitLog||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);const el=$('endHits');if(el){el.hidden=!hl.length;el.innerHTML=hl.length?'<b>Most hits from</b> '+hl.map(([k,n])=>`${(HITN[k]||k).toLowerCase()} ×${n}`).join(' · '):''}}
   $('endCoins').textContent=`+${gems} gems`;
   blip(110,.4,'sawtooth',.07);
   if(!quit){playS('lose',.8);S.deadT=0;shout(S.overrun?'OVERRUN!':'DEFEATED','#ff3b4e',1.8,{sub:S.overrun?'THE KEEP ROLLED OVER YOU':'YOUR RIDE IS DOWN'});S.booms.push({x:S.cannon.x,y:S.cannon.y,r:60,life:.5})}

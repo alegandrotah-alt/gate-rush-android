@@ -21,6 +21,10 @@ const GUIDE={
   weak:{n:'Weak spots',d:'Each faction is weak to one damage type and resists another. The chip at the top shows the weakness.'},
   mods:{n:'Keep conditions',d:'Some keeps roll special conditions that change how they play. They are listed at the top of the screen.'},
   siege:{n:'Siege',d:'If the timer runs out the keep marches on you. Breach it fast or the run ends.'},
+  mortar:{n:'Mortars',d:'A red ring on the road marks where a shell will land. Get out of the ring before it fills.'},
+  laser:{n:'Laser beams',d:'A thin red stripe warns where a beam will fire. Slide sideways out of the stripe.'},
+  missile:{n:'Homing missiles',d:'They curve toward you. Keep moving and cut sideways at the last moment.'},
+  leak:{n:'Minions getting past',d:'Minions that slip past you to the bottom of the road hit your ride. Crush them before they get through.'},
   lvl:{n:'Level-ups',d:'Crushing enemies earns XP. Level-ups wait behind the +LVL button until you want them.'},
 };
 const GUIDE_ORDER=Object.keys(GUIDE);
@@ -44,6 +48,10 @@ function drawGuideIcon(cv,id){
   if(id==='weak'){const w=FWEAK[fid][0];txt(DTN[w].toUpperCase(),DTC[w],W2*.16);return}
   if(id==='mods'){g.strokeStyle='#ffb43a';g.lineWidth=4;g.beginPath();for(let i=0;i<6;i++){const a=i/6*6.283-Math.PI/2;g.lineTo(W2/2+Math.cos(a)*W2*.3,H2/2+Math.sin(a)*W2*.3)}g.closePath();g.stroke();txt('!','#ffb43a',W2*.32);return}
   if(id==='siege'){g.fillStyle='#ff3b4e';g.beginPath();g.moveTo(W2/2,H2*.18);g.lineTo(W2*.84,H2*.8);g.lineTo(W2*.16,H2*.8);g.closePath();g.fill();g.fillStyle='#fff';g.font=`900 ${W2*.32}px Orbitron,sans-serif`;g.textAlign='center';g.textBaseline='middle';g.fillText('!',W2/2,H2*.58);return}
+  if(id==='mortar'){g.strokeStyle='#ff3b4e';g.lineWidth=4;g.beginPath();g.ellipse(W2/2,H2*.62,W2*.36,H2*.15,0,0,6.283);g.stroke();g.fillStyle='rgba(255,59,78,.3)';g.beginPath();g.ellipse(W2/2,H2*.62,W2*.24,H2*.1,0,0,6.283);g.fill();g.drawImage(coreSprite('#ef3b3b','#ffb3b3'),W2*.42,H2*.12,W2*.16,W2*.16);return}
+  if(id==='laser'){g.fillStyle='rgba(255,46,99,.35)';g.fillRect(W2*.42,0,W2*.16,H2);g.fillStyle='rgba(255,190,210,.9)';g.fillRect(W2*.48,0,W2*.04,H2);return}
+  if(id==='missile'){const c3=g3cell('q_missile',160,2,0,W2);if(c3)put(c3);else txt('➶','#ff4a4a',W2*.5);return}
+  if(id==='leak'){txt('▼','#ff5a5a',W2*.5);return}
   if(id==='lvl'){g.fillStyle='#2ab8e0';g.beginPath();g.roundRect(W2*.15,H2*.36,W2*.7,H2*.28,H2*.14);g.fill();txt('+1 LVL','#041018',W2*.15);return}
 }
 function showCard(m){const el=$('guide'),G=GUIDE[m.card],bq=el&&el.querySelector&&el.querySelector('b');if(!el||!G||!bq){MSGON=null;return}

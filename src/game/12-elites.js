@@ -38,14 +38,14 @@ function eliteTick(e,dt){
   else if(E.k==='jet'){if(E.cd<=0){E.cd=Math.max(1.4,2.4-.05*L);for(const s of[-1,1])addBullet(e.x+s*12,e.y,s*80,40,{r:6,home:2.6,life:5,col:4,hp:2})}}
   else if(E.k==='robot'){E.saw+=dt*4;
     for(let i=0;i<3;i++){const a=E.saw+i*2.094,sx=e.x+Math.cos(a)*30,sy=e.y+Math.sin(a)*24;
-      if(c.inv<=0&&Math.hypot(sx-c.x,sy-c.y)<9+st.V.hit)hitPlayer(bd*1.3);
+      if(c.inv<=0&&Math.hypot(sx-c.x,sy-c.y)<9+st.V.hit)hitPlayer(bd*1.3,'saws');
       for(const u of S.players)if(!u.big&&u.w>0&&(u.x-sx)**2+(u.y-sy)**2<121)u.w=0}
     if(E.cd<=0){E.cd=2.6;const a0=aimAt(e.x,e.y);for(let i=-2;i<=2;i++){const a=a0+i*.22;addBullet(e.x,e.y,Math.cos(a)*140,Math.sin(a)*140,{col:1})}}}
   else if(E.k==='tank'){if(E.cd<=0){E.cd=Math.max(1.7,2.7-.05*L);for(let i=0;i<2;i++){const tx=clamp(c.x+(i?(Math.random()-.5)*100:0),36,364),ty=clamp(c.y+(Math.random()-.5)*40,S.fy+60,Y_MAX);S.arts.push({x0:e.x,y0:e.y,x:tx,y:ty,t:0,dur:1.2})}}}
   else if(E.k==='saucer'){if(E.cd<=0){E.cd=Math.max(2,3.2-.06*L);E.hold=1.4;cue('laser');S.lasers.push({x:e.x,y0:e.y+10,t:0,warn:.85,dur:.5,w:14+L*.5})}}
   else if(E.k==='hive'){if(E.cd<=0){E.cd=3.4;for(let i=0;i<3;i++)spawnEnemy(e.x+(i-1)*14,e.y+12,waveB()*.3,false,'runner');
     const off=Math.random();for(let i=0;i<10;i++){const a=(i+off)/10*6.283;addBullet(e.x,e.y,Math.cos(a)*100,Math.sin(a)*100+30,{col:2,hard:1,r:4})}}}
-  if(Math.hypot(e.x-c.x,e.y-c.y)<r+st.V.hit+2)hitPlayer(bd*1.5);
+  if(Math.hypot(e.x-c.x,e.y-c.y)<r+st.V.hit+2)hitPlayer(bd*1.5,'ram');
 }
 // carrier boss drones: they drop down the side lanes, then sweep across at your height
 function droneTick(e,dt){
@@ -54,7 +54,7 @@ function droneTick(e,dt){
   else{e.x-=D.side*125*dt;e.y+=Math.sin(e.wob*.5)*25*dt;D.cd-=dt;
     if(D.cd<=0){D.cd=1.1;const a=aimAt(e.x,e.y);addBullet(e.x,e.y,Math.cos(a)*170,Math.sin(a)*170,{col:5,r:4})}
     if((D.side<0&&e.x>372)||(D.side>0&&e.x<28)){e.w=0;e.dead=true}}
-  if(Math.hypot(e.x-c.x,e.y-c.y)<8+S.st.V.hit){hitPlayer(bulletDmg()*.8);e.w=0;e.dead=true;spark(e.x,e.y,'#ff5050',6)}
+  if(Math.hypot(e.x-c.x,e.y-c.y)<8+S.st.V.hit){hitPlayer(bulletDmg()*.8,'drone');e.w=0;e.dead=true;spark(e.x,e.y,'#ff5050',6)}
 }
 // shield boss pylons: while either stands, the keep shrugs off 85% of damage
 function spawnPylons(){for(const x of [64,336]){const e=spawnEnemy(x,S.fy+110,waveB()*12,true,'');if(e)e.pylon={x,off:110,cd:2+Math.random()}}}

@@ -25,7 +25,7 @@ const G3DPR=()=>(typeof DPR==='number'?DPR:1);
 function g3paint(){const p=cosSel('paint');return p&&G3PAINTS.includes(p.id)?p.id:'ocean'}
 // the player's ride, seen from behind; tilt picks one of five banked frames
 function drawRide3D(g,type,paint,tilt,z){
-  const S3=74*z,i=Math.max(0,Math.min(4,Math.round(2-(tilt||0)/.3*2)));
+  const S3=84*z,i=Math.max(0,Math.min(4,Math.round(2-(tilt||0)/.3*2)));
   const c=g3cell('r_'+type+'_'+paint,384,i,0,S3*G3DPR());if(!c)return false;
   g.drawImage(c,-S3/2,-S3*.66,S3,S3);return true}
 function drawRideIcon(g,type,paint,x,y,z){

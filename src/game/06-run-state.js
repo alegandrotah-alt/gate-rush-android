@@ -108,7 +108,7 @@ function foeDies(e){
   if(e.t==='bomber'){
     S.booms.push({x:e.x,y:e.y,r:44,life:.35});blip(60,.2,'sawtooth',.06);
     for(const u of S.players)if(!u.big&&(u.x-e.x)**2+(u.y-e.y)**2<44*44)u.w=0;
-    if(Math.hypot(S.cannon.x-e.x,S.cannon.y-e.y)<44+S.st.V.hit)hitPlayer(bulletDmg()*1.2);
+    if(Math.hypot(S.cannon.x-e.x,S.cannon.y-e.y)<44+S.st.V.hit)hitPlayer(bulletDmg()*1.2,'bomber');
   }
 }
 function spark(x,y,c,n=3){const cap=LQ()?110:260;for(let i=0;i<n&&S.sparks.length<cap;i++)S.sparks.push({x,y,vx:(Math.random()-.5)*120,vy:(Math.random()-.5)*120,life:.35,c})}
@@ -162,6 +162,10 @@ function fortHit(u){
   return dmg;
 }
 function buzz(p){if(SET.vib&&navigator.vibrate)try{navigator.vibrate(p)}catch(e){}}
+const HITN={bullet:'BULLET',ringed:'RINGED BULLET',missile:'MISSILE',mortar:'MORTAR',laser:'LASER',bomber:'BOMBER BLAST',crash:'MINION CRASH',brute:'BRUTE CRASH',leak:'MINION GOT PAST',saws:'ELITE SAWS',ram:'ELITE RAM',drone:'ELITE DRONE',rift:'RIFT',mine:'MINE',meteor:'METEOR'};
+const HITGUIDE={mortar:'mortar',laser:'laser',leak:'leak',missile:'missile'};
+// a tag over your ride names what just hit you; the run keeps a tally for the end screen
+function hitTag(src,d){src=src||'bullet';S.hitTag={t:HITN[src]||src.toUpperCase(),d:Math.round(d),life:1.3};R.hitLog=R.hitLog||{};R.hitLog[src]=(R.hitLog[src]||0)+1;if(HITGUIDE[src])guide(HITGUIDE[src])}
 function hitPlayer(d,src){
   const c=S.cannon;if(c.inv>0||S.over)return;
   S.lastHit=S.t;
@@ -170,7 +174,7 @@ function hitPlayer(d,src){
     if(has('riot')&&!(S.riotT>S.t)){S.riotT=S.t+3;const r=val('riot');for(const b of S.bul)if(b.life>0&&!b.hard&&(b.x-c.x)**2+(b.y-c.y)**2<r*r)killBullet(b);S.pulses.push({x:c.x,y:c.y,r,life:.3});sfxText(c.x,c.y-30,'RIOT!','#ffb43a',1)}
     if(has('undying')&&c.hp-d*(lim('hull')?.65:1)<=0&&!(S.undyT>0)){d=Math.max(0,c.hp-1);S.undyT=20;S.undyNow=1;sfxText(c.x,c.y-36,'UNDYING!','#ff3b4e',1);award('undying');hitStop(.15)}}
   d*=lim('hull')?.65:1;S.hits=(S.hits||0)+1;S.hitsThisFort++;
-  buzz(35);playS('hit',.7,.9+Math.random()*.2);if(TUT)d*=.35;c.hp-=d;c.inv=S.undyNow?1.5:.35+.08*rank('reflex');S.undyNow=0;S.shake=Math.max(S.shake||0,7);S.hurtFx=1;S.baseShake=.15;popup(c.x,c.y-30,'-'+Math.round(d),'#ff5050');blip(60,.12,'sawtooth',.06);
+  buzz(35);playS('hit',.7,.9+Math.random()*.2);if(TUT)d*=.35;c.hp-=d;c.inv=S.undyNow?1.5:.35+.08*rank('reflex');S.undyNow=0;S.shake=Math.max(S.shake||0,7);S.hurtFx=1;S.baseShake=.15;hitTag(src,d);blip(60,.12,'sawtooth',.06);
   if(has('phoenix'))S.hurtBuff=Math.min(1,S.hurtBuff+val('phoenix'));
   if(c.hp<=0&&lim('wind')&&!R.windUsed){R.windUsed=true;c.hp=S.st.maxHp*.4;c.inv=2;toast('Second Wind!',1500,2);S.bul=[]}
 }

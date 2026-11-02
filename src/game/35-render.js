@@ -117,10 +117,10 @@ function drawWeather(dtR){
   while(weather.length<n)weather.push({x:Math.random()*W,y:Math.random()*H,s:.5+Math.random(),p:Math.random()*6.28});
   if(weather.length>n)weather.length=n;
   for(const w of weather){
-    if(kind==='snow'){w.y+=(30+40*w.s)*dtR;w.x+=Math.sin(S.t+w.p)*12*dtR;ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(w.x,w.y,1.4*w.s+.6,0,6.283);ctx.fill()}
+    if(kind==='snow'){w.y+=(30+40*w.s)*dtR;w.x+=Math.sin(S.t+w.p)*12*dtR;ctx.fillStyle=`rgba(225,238,255,${.22+.18*w.s})`;ctx.fillRect(w.x,w.y,1+w.s*.8,1.6+w.s*2.2)}
     else if(kind==='rain'){w.y+=520*w.s*dtR;w.x-=90*dtR;ctx.strokeStyle='rgba(150,220,255,.45)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(w.x,w.y);ctx.lineTo(w.x+4,w.y-14*w.s);ctx.stroke()}
-    else if(kind==='embers'){w.y-=(25+30*w.s)*dtR;w.x+=Math.sin(S.t*2+w.p)*16*dtR;ctx.fillStyle=`rgba(255,${120+Math.floor(80*w.s)},40,${.5+.4*Math.sin(S.t*6+w.p)})`;ctx.fillRect(w.x,w.y,2*w.s,2*w.s)}
-    else if(kind==='spores'){w.y-=(8+10*w.s)*dtR;w.x+=Math.sin(S.t*.8+w.p)*14*dtR;ctx.fillStyle=`rgba(140,255,200,${.35+.35*Math.sin(S.t*3+w.p)})`;ctx.beginPath();ctx.arc(w.x,w.y,1.2+w.s,0,6.283);ctx.fill()}
+    else if(kind==='embers'){w.y-=(25+30*w.s)*dtR;w.x+=Math.sin(S.t*2+w.p)*16*dtR;ctx.fillStyle=`rgba(255,${120+Math.floor(80*w.s)},40,${.25+.2*Math.sin(S.t*6+w.p)})`;ctx.fillRect(w.x,w.y,2*w.s,2*w.s)}
+    else if(kind==='spores'){w.y-=(8+10*w.s)*dtR;w.x+=Math.sin(S.t*.8+w.p)*14*dtR;ctx.fillStyle=`rgba(140,255,200,${.18+.16*Math.sin(S.t*3+w.p)})`;ctx.fillRect(w.x,w.y,1+w.s,1+w.s)}
     else if(kind==='motes'){w.x+=4*w.s*dtR;w.y+=2*dtR;ctx.fillStyle=`rgba(200,210,255,${.25+.3*Math.sin(S.t*2+w.p)})`;ctx.fillRect(w.x,w.y,1.4*w.s,1.4*w.s);
       if(w.p<.05){w.sx=(w.sx??-50)+700*dtR;ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(w.sx,w.y*.2);ctx.lineTo(w.sx-30,w.y*.2-10);ctx.stroke();if(w.sx>W+60)w.sx=-400-Math.random()*800}}
     else{w.x+=(8+10*w.s)*dtR;w.y+=4*dtR;ctx.fillStyle='rgba(255,220,180,.35)';ctx.fillRect(w.x,w.y,2*w.s,2*w.s)}

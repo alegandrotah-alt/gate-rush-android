@@ -44,11 +44,11 @@ function modsTick(dt){
     if(md.wp==='gust'){const v=md.wdir*dt;c.x=clamp(c.x+v*85,26,374);c.tx=clamp(c.tx+v*85,26,374);for(const u of S.players)u.x+=v*120;for(const e of S.enemies)if(!e.elite&&!e.pylon)e.x+=v*60;for(const b of S.bul)if(!b.hard)b.x+=v*70}}
   if(hasMod('rifts')){md.rt=(md.rt??3)-dt;
     if(md.rt<=0){md.rt=Math.max(3,5.5-.1*S.L);const y=clamp((Math.random()<.5?c.y:S.fy+100+Math.random()*(Y_MAX-S.fy-120))+(Math.random()-.5)*40,S.fy+70,Y_MAX-10);md.rifts.push({y,t:0,warn:1.3,dur:1.4})}
-    for(const r of md.rifts){r.t+=dt;if(r.t>r.warn&&r.t<r.warn+r.dur){if(Math.abs(c.y-r.y)<12+st.V.hit*.5)hitPlayer(bulletDmg()*1.3);
+    for(const r of md.rifts){r.t+=dt;if(r.t>r.warn&&r.t<r.warn+r.dur){if(Math.abs(c.y-r.y)<12+st.V.hit*.5)hitPlayer(bulletDmg()*1.3,'rift');
       for(const u of S.players)if(!u.big&&Math.abs(u.y-r.y)<10)u.w=0;DTY='fire';WCL='';for(const e of S.enemies)if(e.w>0&&!e.elite&&!e.pylon&&Math.abs(e.y-r.y)<10)hurt(e,e.w*3,0)}}
     md.rifts=md.rifts.filter(r=>r.t<r.warn+r.dur)}
   if(md.mines){for(const m of md.mines){m.arm-=dt;if(m.arm>0)continue;
-      if(Math.hypot(m.x-c.x,m.y-c.y)<10+st.V.hit){m.gone=1;hitPlayer(bulletDmg()*2);S.booms.push({x:m.x,y:m.y,r:36,life:.35});sfxText(m.x,m.y-10,'BOOM!','#ff6a3a',1);continue}
+      if(Math.hypot(m.x-c.x,m.y-c.y)<10+st.V.hit){m.gone=1;hitPlayer(bulletDmg()*2,'mine');S.booms.push({x:m.x,y:m.y,r:36,life:.35});sfxText(m.x,m.y-10,'BOOM!','#ff6a3a',1);continue}
       for(const u of S.players){if((u.x-m.x)**2+(u.y-m.y)**2<144){m.gone=1;u.w=0;S.booms.push({x:m.x,y:m.y,r:30,life:.3});blip(70,.15,'sawtooth',.05);break}}}
     md.mines=md.mines.filter(m=>!m.gone);md.mt=(md.mt??6)-dt;if(md.mt<=0){md.mt=6;if(md.mines.length<md.mineN)md.mines.push(newMine())}}
   if(hasMod('shifting')){md.sh=(md.sh??7)-dt;
@@ -59,7 +59,7 @@ function modsTick(dt){
   if(hasMod('meteors')){md.mt2=(md.mt2??3)-dt;
     if(md.mt2<=0){md.mt2=Math.max(1.6,3.4-.08*S.L);const near=Math.random()<.45,x=near?clamp(c.x+(Math.random()-.5)*80,36,364):36+Math.random()*328,y=near?clamp(c.y+(Math.random()-.5)*60,S.fy+60,Y_MAX):S.fy+70+Math.random()*(Y_MAX-S.fy-80);md.met.push({x,y,t:0,dur:1.6})}
     for(const m of md.met){m.t+=dt;if(m.t>=m.dur&&!m.done){m.done=1;S.booms.push({x:m.x,y:m.y,r:42,life:.4});S.shake=Math.max(S.shake||0,6);playS('crunch',.7)||blip(50,.3,'sawtooth',.07);sfxText(m.x,m.y-12,'KRAK!','#ffb43a');
-      if(Math.hypot(c.x-m.x,c.y-m.y)<36+st.V.hit*.5)hitPlayer(bulletDmg()*1.8);for(const u of S.players)if(!u.big&&(u.x-m.x)**2+(u.y-m.y)**2<36*36)u.w=0;
+      if(Math.hypot(c.x-m.x,c.y-m.y)<36+st.V.hit*.5)hitPlayer(bulletDmg()*1.8,'meteor');for(const u of S.players)if(!u.big&&(u.x-m.x)**2+(u.y-m.y)**2<36*36)u.w=0;
       DTY='exp';WCL='';for(const e of S.enemies)if(e.w>0&&!e.pylon&&(e.x-m.x)**2+(e.y-m.y)**2<(40+radius(e.w,e.brute))**2)hurt(e,e.elite?e.max*.15:e.w*3,0)}}
     md.met=md.met.filter(m=>!m.done)}
   if(md.bountyT!=null){md.bountyT-=dt;if(md.bountyT<=0){md.bountyT=null;const e=spawnEnemy(200,S.fy+30,waveB()*5,false,'');if(e){e.courier={t:25,tx:200,ty:S.fy+150,re:0};guide('courier');e.sp=95;toast('A bounty courier is running! Catch it!',2000,3);cue('newfoe')}}}
