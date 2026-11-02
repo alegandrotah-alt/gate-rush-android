@@ -1,0 +1,124 @@
+
+
+<div id="stage">
+  <canvas id="cv"></canvas>
+  <div class="hud">
+    <div class="xpline" aria-label="Experience"><i id="xpFill" style="width:0%"></i></div>
+    <div class="hrow"><span class="lvb" id="lvl">LV 1</span><div class="bar keepbar" aria-label="Enemy keep health"><i id="hpFill" style="width:100%"></i><span class="kl" id="fort">KEEP 1</span><span class="kr" id="hpTxt"></span></div></div>
+    <div class="chips"><span>Weak <b id="weak">-</b></span><span id="zone">-</span><span id="mods">-</span></div>
+    <div id="owned" hidden></div>
+  </div>
+  <div class="hudb"><div class="hullrow"><span id="chpLbl">Hull</span><div class="bar hullbar" id="hullbar"><i id="chpFill" style="width:100%"></i><span id="chp">170</span></div></div>
+    <div class="mini"><span>Coins <u id="runCoins">0</u></span><span>Gates <b id="gates">0/0</b></span><span>Power <b id="army">×1</b></span><span>Repair <b id="rep">30%</b></span></div></div>
+  <button id="lvlBtn" type="button" hidden aria-label="Spend level-ups">+1</button>
+  <div id="toast"></div>
+  <div id="guide" hidden role="status"><canvas width="112" height="112"></canvas><div><small>FIELD GUIDE · NEW</small><b></b><p></p></div></div>
+  <div id="coach" hidden><div class="ca"></div><div class="cb"><span class="ct"></span><button type="button" id="coachSkip">Skip tutorial</button></div></div>
+  <button id="pauseBtn" type="button" aria-label="Pause">II</button>
+  <button id="big" type="button" disabled>BIG<br>ONE</button>
+  <div id="biomeTag" aria-live="polite"></div>
+
+  <div class="overlay menu" id="ovStart">
+    <div class="card wide">
+      <h1 class="logo">GATE<span>RUSH</span></h1>
+      <p class="tagline">Hold the gates. Rush the keep.</p>
+      <nav class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="Play" class="on">Play</button>
+        <button type="button" role="tab" data-tab="Garage">Garage</button>
+        <button type="button" role="tab" data-tab="Research">Research</button>
+        <button type="button" role="tab" data-tab="Records">Records</button>
+        <button type="button" role="tab" data-tab="Settings">Settings</button>
+      </nav>
+      <section id="tabPlay" class="tab">
+        <h3>PICK YOUR RIDE</h3>
+        <div class="vehs" id="vehicles"></div>
+        <p class="small" id="vehDesc"></p>
+        <button class="go alt" id="contBtn" type="button" hidden>Continue run</button>
+        <button class="go" id="play" type="button">START RUN</button>
+        <p class="small" id="best"></p>
+        <details class="how"><summary>How to play</summary>
+        <dl class="tips">
+          <dt>Fly</dt><dd>Drag anywhere to move (or WASD). You fire automatically. Space fires the Big One. Esc pauses.</dd>
+          <dt>Gates</dt><dd>Gates you hold multiply your blobs and stop enemy bullets. Bullets and minions wear them down; a red gate multiplies the keep's minions instead. Fire through it to take it back, or send the Big One to retake it at once.</dd>
+          <dt>Bullets</dt><dd>Your blobs block plain bullets one for one. Outlined bullets pass straight through your stream, so dodge those.</dd>
+          <dt>Dodge</dt><dd>Keeps fire back and escalate into bullet hell. Only the white dot on your ride can be hit. Repairs are capped each fort.</dd>
+          <dt>Level up</dt><dd>Level-ups stack behind the +LVL button (or E / gamepad Y) so they never interrupt you; spend them whenever you like. Keep rewards still open on their own. Weapons (4 slots) kill. Perks (4 slots) change how they work. Boosts are free stats. Max a weapon plus either synergy perk to evolve it.</dd>
+          <dt>Shop</dt><dd>Spend coins on relics between forts. Save coins for interest.</dd>
+          <dt>Field Guide</dt><dd>The first time you meet an enemy or mechanic a card explains it. Every card is collected under Records.</dd>
+          <dt>Credits</dt><dd>Particle, meteor, missile, decal and sound assets by Kenney (kenney.nl). Ship, mech, drone, turret and prop models from Kenney Space Kit and Tower Defense Kit (kenney.nl) and KayKit Space Base, Space Ranger and Combat Mech by Kay Lousberg (kaylousberg.com), re-skinned and rendered for this game. All released CC0. Projectiles modelled for this game.</dd>
+          <dt>Siege</dt><dd>When the timer hits zero the keep marches on you, crushing your gates while hordes grow every second. Breach it within 30 seconds or you are overrun.</dd>
+          <dt>Ranges</dt><dd>Close range is the orange band within 150 of the keep: close-range weapons (Saws, Flamethrower, Orbs, Tesla, Boomerang) deal +35% there and splash 15% of their damage onto the keep, and lifesteal and armour cards only work there. Long range is behind the cyan line: long-range weapons (Storm Rod, Mortar, Missiles, Laser, Railgun) deal +25%. Engineers deploy Turrets, Drones and Mines that fight wherever they are placed.</dd>
+          <dt>Keeps</dt><dd>Every keep rolls a gate layout (Crossroads, Zigzag, High Roller, Fortified, Scatterfield...) and, from keep 2, a condition: Crosswind, Black Ice, Lava Rifts, Minefield, Blackout, Shifting Gates, Barrier Wall, Meteor Shower, Bounty Courier, Twin Keeps or Rebuilding Keep. Later keeps can stack two. Planets make matching conditions more likely.</dd>
+          <dt>Damage types</dt><dd>Weapons deal Kinetic, Explosive, Energy or Fire damage. Each faction is weak to one and resists another (shown when a keep starts and in the HUD). Armored minions fear explosives, phantoms fear energy, splitters fear fire.</dd>
+          <dt>Factions</dt><dd>Every keep is held by one of six factions (machines, bugs, beasts, demons, angels, knights) on a random planet. Each faction favours different minions.</dd>
+          <dt>Elites</dt><dd>Enemy champions fly the same rides you do and fight with the same weapons: gunships, sawmechs, interceptors, siege tanks, lancers, broodcarriers.</dd>
+          <dt>Grand keeps</dt><dd>Boss keeps creep toward you and have a mechanic: pulsing (aim for the middle), carrier (drones sweep the side lanes) or aegis (kill the shield pylons first).</dd>
+        </dl></details>
+      </section>
+      <section id="tabGarage" class="tab" hidden>
+        <div class="row"><h3>COSMETICS</h3><span class="coins" id="bankG">0 gems</span></div>
+        <div id="garage"></div>
+      </section>
+      <section id="tabResearch" class="tab" hidden>
+        <div class="row"><h3>RESEARCH</h3><span class="coins" id="bank">0 gems</span></div>
+        <div class="shop" id="shop"></div>
+      </section>
+      <section id="tabRecords" class="tab" hidden>
+        <div class="grid2" id="recStats"></div>
+        <h3>ACHIEVEMENTS</h3>
+        <div class="achs" id="achList"></div>
+        <h3>FIELD GUIDE <small id="guideCount"></small></h3>
+        <div id="guideList"></div>
+      </section>
+      <section id="tabSettings" class="tab" hidden>
+        <div class="settings" id="settingsMenu"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="overlay" id="ovPause" hidden>
+    <div class="card">
+      <h2>Paused</h2>
+      <p class="small" id="pauseInfo"></p>
+      <div class="loadout" id="ownedP"></div>
+      <p class="small" id="pauseStats"></p>
+      <button class="go" id="resume" type="button">RESUME</button>
+      <details class="how"><summary>Settings</summary><div class="settings" id="settingsPause" style="margin-top:8px"></div></details>
+      <button class="go alt danger" id="quit" type="button">End run and return to menu</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="ovPick" hidden>
+    <div class="card">
+      <h2 id="pickTitle">Level up!</h2>
+      <p class="small" id="pickSlots"></p>
+      <div class="picks" id="picks"></div>
+      <div class="row2"><button class="go alt" id="reroll" type="button">Reroll (2 left)</button><button class="go alt" id="pickLater" type="button">Later</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ovShop" hidden>
+    <div class="card wide">
+      <h2 id="shopTitle">Fort down</h2>
+      <p class="small" id="shopPay"></p>
+      <div class="row"><h3>RELICS</h3><span class="coins" id="shopCoins">0 coins</span></div>
+      <div class="relics" id="relicCards"></div>
+      <div class="row2"><button class="go alt" id="shopReroll" type="button">Reroll</button><button class="go alt" id="packBtn" type="button">Upgrade pack</button></div>
+      <h3 id="slotTxt">Your relics</h3>
+      <div class="own" id="ownRelics"></div>
+      <p class="small" id="nextInfo"></p>
+      <button class="go" id="nextFort" type="button">Next fort →</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="ovEnd" hidden>
+    <div class="card">
+      <h2 id="endTitle">Run over</h2>
+      <div class="grid2" id="endStats"></div>
+      <div class="list" id="endBuild"></div>
+      <p class="coins" id="endCoins"></p>
+      <button class="go" id="again" type="button">BACK TO MENU</button>
+    </div>
+  </div>
+</div>
+

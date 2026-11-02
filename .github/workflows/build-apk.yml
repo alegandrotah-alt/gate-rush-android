@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build, test and release
 
 on:
   push:
@@ -7,9 +7,45 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
+  checks:
+    name: Checks (balance sims + browser test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Build the game from src/
+        run: node tools/build.js
+
+      - name: Balance simulation (seeded bot runs for every ride)
+        run: node tools/sim.js --runs 4
+
+      - name: Install a headless browser
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser check (script errors, tutorial, frame times on a slowed CPU)
+        run: node tools/browser-check.js
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-check-screens
+          path: check-output/
+          retention-days: 14
+
   build:
+    name: Android APK
+    needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -28,6 +64,9 @@ jobs:
         run: |
           npm install
           pip install pillow
+
+      - name: Build the game from src/
+        run: node tools/build.js
 
       - name: Bundle fonts for offline play
         run: python3 tools/fetch_fonts.py
@@ -82,3 +121,38 @@ jobs:
           name: gate-rush-apk
           path: GateRush-*.apk
           retention-days: 30
+
+  web:
+    name: Web version (GitHub Pages)
+    needs: checks
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Build the game from src/
+        run: node tools/build.js
+
+      - name: Bundle fonts for offline play
+        run: python3 tools/fetch_fonts.py
+
+      - name: Stamp the offline cache with this build
+        run: sed -i "s/const CACHE = 'gate-rush-v1'/const CACHE = 'gate-rush-${{ github.run_number }}'/" www/sw.js
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: www
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
