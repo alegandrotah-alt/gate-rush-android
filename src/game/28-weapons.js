@@ -18,7 +18,7 @@ function weaponsTick(o,W){
       for(const g of gs){const gx_=(g.x1+g.x2)/2+gateX(g);S.bolts.push({x1:f.x,y1:f.y,x2:gx_,y2:g.y,life:.2});f={x:gx_,y:g.y};m*=gateMul(g);g.flash=.3}
       S.bolts.push({x1:f.x,y1:f.y,x2:f.x,y2:S.fy,life:.2});fortMelee(dmg*m*E*2)}
     if(o.main&&has('conductor')&&Math.random()<val('conductor')[0]){const gs=S.lv.gates.filter(g=>g.t==='mul'&&!g.dead&&!g.follow);if(gs.length){const g=rnd(gs);g.bonus=(g.bonus||0)+val('conductor')[1];g.flash=.4;const gx_=(g.x1+g.x2)/2+gateX(g);S.bolts.push({x1:o.x,y1:o.y-20,x2:gx_,y2:g.y,life:.2});popup(gx_,g.y-14,'+1','#d9f4ff')}}
-    if(Math.random()<.15)sfxText(o.x,o.y-40,'ZZT!','#5fe1ff');blip(900,.05,'square',.025)});
+    if(Math.random()<.15)sfxText(o.x,o.y-40,'ZZT!','#5fe1ff');(playS('zap',.28,.85+Math.random()*.3)||blip(900,.05,'square',.025))});
   DTY='exp';WCL='long';// Mortar / Carpet Bomb
   if(st.bomb&&cd(tm,'bomb',dt,Math.max(1.2,3.8-.5*st.bomb)*W.CD))fireEv(()=>{for(let b=0;b<(st.carpet?4:1);b++){const d=densest();if(!d)break;S.shells.push({x0:o.x,y0:o.y-20,x:d.x,y:d.y,t:0,dur:.55,r:30+6*st.bomb,dmg:(1.2+.9*st.bomb)*P*(st.carpet?E:1),carpet:!!st.carpet})}});
   DTY='exp';WCL='long';// Homing Missiles / Missile Swarm
@@ -68,7 +68,7 @@ function weaponsTick(o,W){
     for(const ang of shots){const x1=o.x+Math.tan(ang)*(o.y-S.fy);const gp=ang===0?gateProduct(o.x,S.fy,o.y):1,gm=st.massdriver?gp:Math.pow(gp,W.CH);
       for(const e of S.enemies){if(e.w<=0||e.y>o.y)continue;const lx=o.x+(x1-o.x)*((o.y-e.y)/Math.max(1,o.y-S.fy));if(Math.abs(e.x-lx)<8+radius(e.w,e.brute))hurt(e,dmg*gm,2)}
       fortMelee(dmg*(st.massdriver?gm*3:.15*gm));S.rails.push({x:o.x,x1,y0:o.y-16,life:.3,big:!!st.massdriver})}
-    blip(1200,.08,'sawtooth',.04)});
+    (playS('rail',.4,.95+Math.random()*.1)||blip(1200,.08,'sawtooth',.04))});
   DTY='kin';WCL='eng';// Sentry Turret / Fortress Protocol
   if(st.sentry&&o.main&&cd(tm,'sentry',dt,(st.fortress?3:Math.max(3.4,6.5-.6*st.sentry))*W.CD)){const cap=st.fortress?8:1+st.sentry+(has('vonneumann')?2:0);if(S.sent.length<cap){S.sent.push({x:o.x,y:o.y-12,t:st.fortress?999:12,cd:.2,hp:st.fortress?12:6,re:has('vonneumann')?1:0});blip(500,.06,'square',.03);if(S.sent.length>=6)award('eng6')}}
   DTY='kin';WCL='close';// Phase Blade / Riftcutter: a sweeping arc that cuts enemies and plain bullets
@@ -92,7 +92,7 @@ function weaponsTick(o,W){
     const r=(60+8*st.tesla)*(st.reactor?2:1)*(o.main?1:.7),dmg=(.6+.3*st.tesla)*P*(st.reactor?E:1);
     for(const e of S.enemies){if(e.w>0&&(e.x-o.x)**2+(e.y-o.y)**2<(r+radius(e.w,e.brute))**2)hurt(e,dmg,2)}
     const br=st.reactor?r:r*.6;for(const b of S.bul){if(b.life<=0)continue;const d2=(b.x-o.x)**2+(b.y-o.y)**2;if((st.reactor||!b.hard)&&d2<br*br)killBullet(b);else if(st.cryo&&!b.hard&&d2<r*r)b.frz=1}
-    S.pulses.push({x:o.x,y:o.y,r,life:.3});blip(1500,.04,'square',.02)});
+    S.pulses.push({x:o.x,y:o.y,r,life:.3});(playS('zap',.18,1.3+Math.random()*.3)||blip(1500,.04,'square',.02))});
 }
 
 function densest(){const alive=S.enemies.filter(e=>e.w>0);if(!alive.length)return null;let best=null,bs=-1;for(let i=0;i<12;i++){const e=rnd(alive);let s2=0;for(const f of alive){const dx=f.x-e.x,dy=f.y-e.y;if(dx*dx+dy*dy<1600)s2+=f.w}if(s2>bs){bs=s2;best=e}}return best}
@@ -101,7 +101,7 @@ function gatePass(p,y0,y1){for(const g of S.lv.gates){if(g.dead||g.t!=='mul'||g.
 function glaivePos(){const out=[];for(let i=0;i<3;i++){const a=S.t*1.6+i*2.094;out.push({x:200+Math.cos(a)*140,y:S.fy+30+Math.sin(a)*22})}return out}
 function blowMine(m,chain){
   if(m.gone)return;m.gone=1;DTY='exp';const st=S.st,r=40,dmg=m.dmg*(st.minefield?Math.pow(1.25,Math.min(chain,30)):1);
-  S.booms.push({x:m.x,y:m.y,r,life:.25});blip(70,.15,'sawtooth',.04);
+  S.booms.push({x:m.x,y:m.y,r,life:.25});playS('mine',.32,.9+Math.random()*.2)||blip(70,.15,'sawtooth',.04);
   for(const e of S.enemies){if(e.w>0&&(e.x-m.x)**2+(e.y-m.y)**2<(r+radius(e.w,e.brute))**2)hurt(e,dmg)}
   if(st.minefield){S.traps.push({x:m.x,y:m.y,t:2.5,r:18,dps:dmg*.3});for(const o of S.mine)if(!o.gone&&(o.x-m.x)**2+(o.y-m.y)**2<80*80)blowMine(o,chain+1)}
 }

@@ -32,7 +32,7 @@ function renderGarage(){
     for(const it of COS[kind]){const own=META.cos[kind].includes(it.id),on=META.sel[kind]===it.id,sec=it.secret&&!own?SECRETS.find(x=>x.id===it.secret):null;
       const b=document.createElement('button');b.type='button';b.className='sw'+(on?' on':'')+(own?'':' locked')+(it.secret?' secretc':'');b.disabled=!own&&!sec&&META.gems<it.cost;
       b.innerHTML=`<canvas width="128" height="88"></canvas><b>${sec?'◆ Secret':it.name}</b><small>${on?'Equipped':own?'Owned':sec?'Hidden achievement':it.cost+' gems'}</small>`;
-      b.addEventListener('click',()=>{if(sec){toast(`Secret reward. Hint: “${sec.hint}”`,3200,1);return}if(!own){if(META.gems<it.cost)return;META.gems-=it.cost;META.cos[kind].push(it.id);achMeta();blip(700,.08,'triangle',.05)}META.sel[kind]=it.id;saveMeta();renderGarage();renderShop()});
+      b.addEventListener('click',()=>{if(sec){toast(`Secret reward. Hint: “${sec.hint}”`,3200,1);return}if(!own){if(META.gems<it.cost)return;META.gems-=it.cost;META.cos[kind].push(it.id);achMeta();(playS('shop',.55)||blip(700,.08,'triangle',.05))}META.sel[kind]=it.id;saveMeta();renderGarage();renderShop()});
       grid.appendChild(b);cosPreview(b.querySelector('canvas'),kind,it)}
     sec.appendChild(grid);box.appendChild(sec)}
 }

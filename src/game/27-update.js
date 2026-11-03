@@ -184,6 +184,7 @@ function update(dt){
   }
   DTY='exp';WCL='';if(S.bursts.length){const list=S.bursts;S.bursts=[];for(const b of list.slice(0,80)){S.booms.push({x:b.x,y:b.y,r:b.r*.7,life:.18});for(const e of S.enemies){if(e.w<=0)continue;const dx=e.x-b.x,dy=e.y-b.y;if(dx*dx+dy*dy<b.r*b.r)hurt(e,b.dmg*ud,b.wpn?2:0)}}}
 
+  {const hp=S.cannon.hp/Math.max(1,st.maxHp);if(hp<.3&&hp>0&&!S.over){S.hbT=(S.hbT??0)-dt;if(S.hbT<=0){S.hbT=.55+.5*(hp/.3);blip(96,.08,'triangle',.085);setTimeout(()=>blip(78,.1,'triangle',.07),140)}}else S.hbT=0}
   // ---------- weapons (scale with raw firepower) ----------
   const P=st.weight*st.shots/st.fireInt*ud,E=st.evoM;
   if(!st.inferno)S.rage=Math.max(0,S.rage-S.rage*.12*dt);if(S.moonDirty){S.moonDirty=0;restat()}
@@ -232,7 +233,7 @@ function update(dt){
   for(const tr of S.traps){tr.t-=dt;for(const e of S.enemies){if(e.w>0&&(e.x-tr.x)**2+(e.y-tr.y)**2<(tr.r+radius(e.w,e.brute))**2)hurt(e,tr.dps*dt,1)}for(const b of S.bul){if(b.life>0&&!b.hard&&(b.x-tr.x)**2+(b.y-tr.y)**2<tr.r*tr.r)killBullet(b)}}
   S.traps=S.traps.filter(t=>t.t>0);
   DTY='exp';WCL='long';// mortar shells
-  for(const s2 of S.shells){s2.t+=dt;if(s2.t>=s2.dur&&!s2.done){s2.done=true;S.booms.push({x:s2.x,y:s2.y,r:s2.r,life:.3});if(Math.random()<.4)sfxText(s2.x,s2.y-10,'BOOM!','#ffb43a');blip(80,.18,'sawtooth',.05);let killed=0;
+  for(const s2 of S.shells){s2.t+=dt;if(s2.t>=s2.dur&&!s2.done){s2.done=true;S.booms.push({x:s2.x,y:s2.y,r:s2.r,life:.3});if(Math.random()<.4)sfxText(s2.x,s2.y-10,'BOOM!','#ffb43a');(playS('boom',.38,.85+Math.random()*.3)||blip(80,.18,'sawtooth',.05));let killed=0;
     for(const e of S.enemies){const dx=e.x-s2.x,dy=e.y-s2.y;if(e.w>0&&dx*dx+dy*dy<(s2.r+radius(e.w,e.brute))**2){hurt(e,s2.dmg,2);if(e.w<=0)killed+=e.max}}
     if(s2.carpet&&killed>0)spawnPlayer(s2.x,s2.y,killed*.5*E,0)}}
   S.shells=S.shells.filter(s2=>!s2.done);
@@ -290,7 +291,7 @@ function update(dt){
   S.sparks=S.sparks.filter(p=>p.life>0);
   S.baseShake=Math.max(0,S.baseShake-dt);
 
-  while(R.xp>=R.need){R.xp-=R.need;R.lvl++;R.need=xpNeed(R.lvl);R.pendingPicks++;popup(S.cannon.x,S.cannon.y-44,'LEVEL UP +','#9ff0ff');vfx({k:'magic_03',x:S.cannon.x,y:S.cannon.y-6,s0:20,s1:90,dur:.5,col:'#9ff0ff',add:1,rot:0,vr:3});if(!playS('ready',.45)){blip(880,.08,'triangle',.04);blip(1320,.1,'triangle',.03)}}
+  while(R.xp>=R.need){R.xp-=R.need;R.lvl++;R.need=xpNeed(R.lvl);R.pendingPicks++;popup(S.cannon.x,S.cannon.y-44,'LEVEL UP +','#9ff0ff');vfx({k:'magic_03',x:S.cannon.x,y:S.cannon.y-6,s0:20,s1:90,dur:.5,col:'#9ff0ff',add:1,rot:0,vr:3});if(!playS('level',.5)&&!playS('ready',.45)){blip(880,.08,'triangle',.04);blip(1320,.1,'triangle',.03)}}
   if(!(S.baseHP>0)&&!S.over)fortDown();
   else if(c.hp<=0&&!S.over)runOver();
   else if(R.pendingPicks>0&&!R.picking&&SET.autolvl)autoPick();

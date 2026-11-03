@@ -105,6 +105,7 @@ function pickFoe(){
   return k;
 }
 function foeDies(e){
+  if(e.brute&&!e.elite&&S&&S.running){playS('crunch',.4,.8+Math.random()*.2);vfx({k:'circle_02',x:e.x,y:e.y-6,s0:16,s1:70,dur:.32,col:'#ffcf2e',add:1})}
   if(e.t==='splitter'&&!e.child){for(let i=0;i<3;i++){const c2=spawnEnemy(e.x+(i-1)*10,e.y+4,e.max*.35,false,'');if(c2)c2.child=1}}
   if(e.t==='bomber'){
     S.booms.push({x:e.x,y:e.y,r:44,life:.35});blip(60,.2,'sawtooth',.06);

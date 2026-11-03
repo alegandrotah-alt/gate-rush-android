@@ -4,11 +4,11 @@
   <canvas id="cv"></canvas>
   <div class="hud">
     <div class="xpline" aria-label="Experience"><i id="xpFill" style="width:0%"></i></div>
-    <div class="hrow"><span class="lvb" id="lvl">LV 1</span><div class="bar keepbar" aria-label="Enemy keep health"><i id="hpFill" style="width:100%"></i><span class="kl" id="fort">KEEP 1</span><span class="kr" id="hpTxt"></span></div></div>
+    <div class="hrow"><span class="lvb" id="lvl">LV 1</span><div class="bar keepbar" aria-label="Enemy keep health"><b class="lag" id="hpLag"></b><i id="hpFill" style="width:100%"></i><span class="kl" id="fort">KEEP 1</span><span class="kr" id="hpTxt"></span></div></div>
     <div class="chips"><span>Weak <b id="weak">-</b></span><span id="zone">-</span><span id="mods">-</span></div>
     <div id="owned" hidden></div>
   </div>
-  <div class="hudb"><div class="hullrow"><span id="chpLbl">Hull</span><div class="bar hullbar" id="hullbar"><i id="chpFill" style="width:100%"></i><span id="chp">170</span></div></div>
+  <div class="hudb"><div class="hullrow"><span id="chpLbl">Hull</span><div class="bar hullbar" id="hullbar"><b class="lag" id="chpLag"></b><i id="chpFill" style="width:100%"></i><span id="chp">170</span></div></div>
     <div class="mini"><span>Coins <u id="runCoins">0</u></span><span>Gates <b id="gates">0/0</b></span><span>Power <b id="army">×1</b></span><span>Repair <b id="rep">30%</b></span></div></div>
   <button id="lvlBtn" type="button" hidden aria-label="Spend level-ups">+1</button>
   <div id="toast"></div>

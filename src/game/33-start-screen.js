@@ -9,7 +9,7 @@ function renderShop(){
       const r=rank(it.id),maxed=r>=it.max,cost=shopCost(it.id),open=resOpen(it);
       const b=document.createElement('button');b.type='button';b.disabled=maxed||!open||META.gems<cost;b.className='node'+(it.req?' sub':'')+(maxed?' max':'');
       b.innerHTML=`<b>${it.name}</b><small>${it.desc}</small><span class="pips">${Array.from({length:it.max},(_,i)=>`<i class="${i<r?'on':''}"></i>`).join('')}</span><small>${maxed?'Maxed':!open?`Needs ${RESN[it.req[0]].name} ${it.req[1]}`:cost+' gems'}</small>`;
-      b.addEventListener('click',()=>{if(b.disabled)return;META.gems-=cost;META.shop[it.id]=r+1;saveMeta();achMeta();blip(700,.08,'triangle',.05);renderShop()});
+      b.addEventListener('click',()=>{if(b.disabled)return;META.gems-=cost;META.shop[it.id]=r+1;saveMeta();achMeta();(playS('shop',.55)||blip(700,.08,'triangle',.05));renderShop()});
       col.appendChild(b);
     }
     box.appendChild(col);

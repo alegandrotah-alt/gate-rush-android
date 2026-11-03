@@ -96,6 +96,7 @@ function toast(t,ms,pri,card){pri=pri??1;const m={t,ms:ms||1800,pri,at:performan
   showMsg(m)}
 function showMsg(m){if(m.card){showCard(m);return}const el=$('toast');el.textContent=m.t;el.classList.remove('p0','p1','p2','p3');el.classList.add('on','p'+m.pri);MSGON=m;clearTimeout(toastT);toastT=setTimeout(()=>{el.classList.remove('on');MSGON=null},m.ms)}
 function msgTick(){if(MSGON||!MSGQ.length||cutBig())return;const now=performance.now();while(MSGQ.length&&MSGQ[0].pri<3&&now-MSGQ[0].at>7000)MSGQ.shift();if(MSGQ.length)setTimeout(()=>{if(!MSGON&&MSGQ.length&&!cutBig())showMsg(MSGQ.shift())},200)}
+function msgFlushBattle(){MSGQ.length=0;if(MSGON&&!MSGON.card&&!MSGON.keep){clearTimeout(toastT);$('toast').classList.remove('on');MSGON=null}}
 function msgClear(){MSGQ.length=0;MSGON=null;clearTimeout(toastT);$('toast').classList.remove('on');hideCard();if(TUT){TUT=null;$('coach').hidden=true}}
 function renderOwned(){
   const parts=[];

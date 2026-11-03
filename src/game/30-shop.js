@@ -1,7 +1,8 @@
 // ---------- fort clear → shop ----------
 function fortDown(){
+  msgFlushBattle();
   S.shake=14;for(let i=0;i<40;i++)S.sparks.push({x:40+Math.random()*320,y:S.fy-Math.random()*30,vx:(Math.random()-.5)*240,vy:-Math.random()*200,life:.7,c:Math.random()<.5?'#ffb02e':'#8e2236'});
-  S.over=true;S.running=false;R.forts++;S.breachT=0;S.cannon.inv=99;buzz([60,40,140]);shout('BREACHED!','#ffcf2e',1.6,{sub:`GATEKEEP ${S.L} FELL IN ${Math.ceil(S.t)}S`});
+  S.over=true;S.running=false;R.forts++;S.breachT=0;S.cannon.inv=99;vfx({k:'circle_02',x:200,y:S.fy+12,s0:40,s1:460,dur:.7,col:'#ffcf2e',add:1});vfx({k:'circle_02',x:200,y:S.fy+12,s0:20,s1:260,dur:.45,col:'#ffffff',add:1});buzz([60,40,140]);shout('BREACHED!','#ffcf2e',1.6,{sub:`GATEKEEP ${S.L} FELL IN ${Math.ceil(S.t)}S`});
   for(const e of S.enemies){spark(e.x,e.y,e.brute?'#ffcf2e':'#ff7a7a',2);e.w=0}
   S.enemies=[];S.bul=[];S.lasers=[];S.emit=[];S.arts=[];
   const left=Math.max(0,S.lv.T-S.t);
@@ -43,14 +44,14 @@ function drawShop(){
   $('shopTitle').textContent=`Gatekeep ${S.L} breached`;
   $('shopPay').textContent=`Paid ${p.base} + ${p.speed} speed bonus + ${p.interest} interest${p.greed?' + '+p.greed+' greed':''}. Interest: 1 per 5 coins held, max 5.`;
   $('shopCoins').textContent=R.coins+' coins';
-  const box=$('relicCards');box.innerHTML='';
+  const box=$('relicCards');box.innerHTML='';if(!SH.drawn&&box.classList){SH.drawn=1;box.classList.add('enter');setTimeout(()=>box.classList.remove('enter'),900)}
   SH.cards.forEach((c,i)=>{
     const b=document.createElement('button');b.type='button';b.className='relic';
     const own=has(c.id),up=own>0,sold=SH.sold.includes(i),price=up?Math.max(1,relicPrice(c)-sellPrice(c.id)):relicPrice(c),full=!up&&R.relics.length>=R.slots,tt=relicTierOf(c.id,c.t);
     b.disabled=sold||R.coins<price||full||(up&&own>=c.t);
     b.style.setProperty('--rc',TIERC[tt]);
     b.innerHTML=`<img class="ric" src="${iconFor(c.id,'relic',c.t)}" alt=""><span class="rar">${TIERN[tt]}${up?` · upgrade from ${ROMAN[own]}, pay the difference`:''}</span><b>${relicName(c.id,c.t)}</b><span>${relicDesc(c.id,c.t)}</span><em>${sold?'Bought':full?'Slots full':price+' coins'}</em>`;
-    b.addEventListener('click',()=>{if(b.disabled)return;R.coins-=price;buyRelic(c);R.relicsBought=(R.relicsBought||0)+1;checkAch('buy');SH.sold.push(i);blip(700,.08,'triangle',.05);renderOwned();drawShop()});
+    b.addEventListener('click',()=>{if(b.disabled)return;R.coins-=price;buyRelic(c);R.relicsBought=(R.relicsBought||0)+1;checkAch('buy');SH.sold.push(i);(playS('shop',.55)||blip(700,.08,'triangle',.05));renderOwned();drawShop()});
     box.appendChild(b);
   });
   const pk=$('packBtn');pk.textContent=`Upgrade pack: pick 1 of 3 (${SH.pack} coins)`;pk.disabled=R.coins<SH.pack;
@@ -76,7 +77,12 @@ function nextFort(){
   $('ovShop').hidden=true;startFort(S.L+1,false);S.running=true;
   if(S.lv.boss)cue('boss');
 }
+// counts every [data-n] number in a panel up from zero, ticking softly as it goes
+function countUp(root){if(!root||!root.querySelectorAll)return;const els=[...root.querySelectorAll('[data-n]')];if(!els.length)return;const t0=performance.now(),dur=900;let tick=0;
+  const step=()=>{const p=Math.min(1,(performance.now()-t0)/dur),e=1-Math.pow(1-p,3);for(const el of els){const v=Math.round(+el.dataset.n*e);el.textContent=el.dataset.f?fmt(v):String(v)}
+    if(p<1){if(++tick%4===0)blip(900+600*e,.025,'triangle',.018);requestAnimationFrame(step)}else playS('coin',.45)};requestAnimationFrame(step)}
 function runOver(quit){
+  msgFlushBattle();
   clearRun();
   S.over=true;S.running=false;MUS.mode='menu';
   const gems=R.forts*R.forts+R.forts*4;
@@ -84,15 +90,15 @@ function runOver(quit){
   META.gems+=gems;META.best=Math.max(META.best,R.forts);R.banked=true;saveMeta();mileCheck();
   $('endTitle').textContent=quit?`Retreated at gatekeep ${S.L}`:S.siege?`Overrun in the siege of gatekeep ${S.L}`:`Fallen at gatekeep ${S.L}`;
   const m=Math.floor(R.time/60),s=Math.floor(R.time%60);
-  $('endStats').innerHTML=`<div><b>${R.forts}</b>forts destroyed</div><div><b>${R.lvl}</b>level reached</div><div><b>${fmt(R.kills)}</b>enemies crushed</div><div><b>${m}:${String(s).padStart(2,'0')}</b>run time</div>`;
+  $('endStats').innerHTML=`<div><b data-n="${R.forts}">${R.forts}</b>forts destroyed</div><div><b data-n="${R.lvl}">${R.lvl}</b>level reached</div><div><b data-n="${Math.round(R.kills)}" data-f="1">${fmt(R.kills)}</b>enemies crushed</div><div><b>${m}:${String(s).padStart(2,'0')}</b>run time</div>`;
   const bl=$('endBuild');bl.innerHTML='';
   const vs=document.createElement('span');vs.style.background='#fff';vs.textContent=VEH[R.veh].name;bl.appendChild(vs);
   for(const id of R.relics){const sp=document.createElement('span');sp.style.background=TIERC[relicTierOf(id,has(id))];sp.textContent=relicName(id,has(id));bl.appendChild(sp)}
   for(const [id,l] of Object.entries(R.ups)){const u=UPNAME[id];const sp=document.createElement('span');sp.style.background=CATC[u.cat];sp.textContent=u.cat==='evo'||u.cat==='lim'?u.name:`${u.name} ${l}`;bl.appendChild(sp)}
   {const hl=Object.entries(R.hitLog||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);const el=$('endHits');if(el){el.hidden=!hl.length;el.innerHTML=hl.length?'<b>Most hits from</b> '+hl.map(([k,n])=>`${(HITN[k]||k).toLowerCase()} ×${n}`).join(' · '):''}}
-  $('endCoins').textContent=`+${gems} gems`;
+  $('endCoins').innerHTML=`+<b data-n="${gems}">${gems}</b> gems`;
   blip(110,.4,'sawtooth',.07);
   if(!quit){playS('lose',.8);S.deadT=0;shout(S.overrun?'OVERRUN!':'DEFEATED','#ff3b4e',1.8,{sub:S.overrun?'THE KEEP ROLLED OVER YOU':'YOUR RIDE IS DOWN'});S.booms.push({x:S.cannon.x,y:S.cannon.y,r:60,life:.5})}
-  setTimeout(()=>{$('ovEnd').hidden=false;$('again').focus()},quit?400:1800);
+  setTimeout(()=>{$('ovEnd').hidden=false;$('again').focus();countUp($('ovEnd'))},quit?400:1800);
 }
 
