@@ -29,7 +29,7 @@ function renderGarage(){
     for(const it of COS[kind]){const own=META.cos[kind].includes(it.id),on=META.sel[kind]===it.id;
       const b=document.createElement('button');b.type='button';b.className='sw'+(on?' on':'')+(own?'':' locked');b.disabled=!own&&META.gems<it.cost;
       b.innerHTML=`<canvas width="128" height="88"></canvas><b>${it.name}</b><small>${on?'Equipped':own?'Owned':it.cost+' gems'}</small>`;
-      b.addEventListener('click',()=>{if(!own){if(META.gems<it.cost)return;META.gems-=it.cost;META.cos[kind].push(it.id);blip(700,.08,'triangle',.05)}META.sel[kind]=it.id;saveMeta();renderGarage();renderShop()});
+      b.addEventListener('click',()=>{if(!own){if(META.gems<it.cost)return;META.gems-=it.cost;META.cos[kind].push(it.id);achMeta();blip(700,.08,'triangle',.05)}META.sel[kind]=it.id;saveMeta();renderGarage();renderShop()});
       grid.appendChild(b);cosPreview(b.querySelector('canvas'),kind,it)}
     sec.appendChild(grid);box.appendChild(sec)}
 }

@@ -17,6 +17,6 @@ function fortAttack(kind){
   else if(kind==='laser'){cue('laser');const n=L>=12?2:1;guide('laser');for(let i=0;i<n;i++)S.lasers.push({x:i?clamp(c.x+(Math.random()<.5?-90:90),40,360):c.x,t:0,warn:1.05,dur:.55,w:16+L*.6})}
   else if(kind==='homing'){const n=1+Math.floor(L/5);for(let i=0;i<n;i++)addBullet(turX(rnd(liveTur())),y0,(Math.random()-.5)*60,60,{r:7,home:2.2,life:6,col:4,hp:3})}
   else if(kind==='wall'){const gap=60+Math.random()*280,n=26;for(let i=0;i<n;i++){const x=30+i*13.4;if(Math.abs(x-gap)<34)continue;addBullet(x,y0,0,100*sp,{r:5,col:2,hard:1})}}
-  else if(kind==='mortar'){const n=L>=8?2:1;for(let i=0;i<n;i++){const tx=clamp(c.x+(i?(Math.random()<.5?-60:60):0),45,355),ty=clamp(c.y+(Math.random()-.5)*30,Y_MIN,Y_MAX);guide('mortar');S.arts.push({x0:200+(Math.random()-.5)*200,y0:S.fy,x:tx,y:ty,t:0,dur:1.35})}}
+  else if(kind==='mortar'){const n=L>=8?2:1;for(let i=0;i<n;i++){const tx=clamp(c.x+(i?(Math.random()<.5?-60:60):0),45,355),ty=clamp(c.y+(Math.random()-.5)*30,Y_MIN,Y_MAX);guide('mortar');S.mortarN=(S.mortarN||0)+1;S.arts.push({x0:200+(Math.random()-.5)*200,y0:S.fy,x:tx,y:ty,t:0,dur:1.35})}}
 }
 

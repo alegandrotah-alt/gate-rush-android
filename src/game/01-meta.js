@@ -109,13 +109,51 @@ const ACH=[
   {id:'cond2',name:'Bad Weather',d:'Breach a keep with two keep conditions at once',g:40},
   {id:'bounty',name:'Bounty Hunter',d:'Catch a bounty courier',g:20},
   {id:'twin',name:'Double Trouble',d:'Breach Twin Keeps',g:30},
+  {id:'tut',name:'Graduate',d:'Finish the tutorial',g:15},
+  {id:'guide13',name:'Field Notes',d:'Discover 13 Field Guide entries',g:25},
+  {id:'guideall',name:'Field Researcher',d:'Discover every Field Guide entry',g:80},
+  {id:'fast20',name:'Blitz',d:'Breach a keep in under 20 seconds',g:40},
+  {id:'thread',name:'Hanging by a Thread',d:'Breach a keep with less than 10% hull left',g:40},
+  {id:'shells',name:'Shell Shocked',d:'Breach a keep after 10 mortar shells without a single mortar hit',g:50},
+  {id:'hoard100',name:'Vault',d:'Hold 100 coins at once',g:60},
+  {id:'lvl50',name:'Transcendent',d:'Reach level 50 in one run',g:100},
+  {id:'res10',name:'Researcher',d:'Buy 10 research upgrades',g:30},
+  {id:'style6',name:'Stylist',d:'Own 6 cosmetics you bought',g:30},
+  {id:'courier3',name:'Hot Pursuit',d:'Catch 3 bounty couriers in one run',g:50},
+  {id:'iron5',name:'Iron Wall',d:'Breach 5 keeps in one run without losing a gate in any of them',g:80},
 ];
+// milestones: lifetime goals with five levels each; every level pays gems, so steady play keeps paying out
+const MROMAN=['I','II','III','IV','V'];
+const live=k=>R&&!R.banked?(R[k]||0):0;
+const MILE=[
+  {id:'kills',name:'Horde Crusher',u:'enemies crushed',t:[500,2500,10000,50000,250000],g:[15,30,60,120,250],v:()=>META.rec.kills+Math.round(live('kills'))},
+  {id:'forts',name:'Keep Breaker',u:'keeps breached',t:[5,25,75,200,500],g:[15,30,60,120,250],v:()=>META.rec.forts+live('forts')},
+  {id:'runs',name:'Veteran',u:'runs played',t:[3,10,25,60,150],g:[10,20,40,80,160],v:()=>META.rec.runs},
+  {id:'deep',name:'Deep Diver',u:'keeps in your best run',t:[3,6,10,15,25],g:[15,30,60,120,250],v:()=>Math.max(META.best,live('forts'))},
+  {id:'elites',name:'Elite Hunter',u:'elites defeated',t:[5,25,75,200,500],g:[15,30,60,120,250],v:()=>META.rec.elites||0},
+  {id:'bosses',name:'Grand Slayer',u:'Grand Gatekeeps breached',t:[1,5,15,40,100],g:[20,40,80,150,300],v:()=>META.rec.bosses||0},
+  {id:'flawless',name:'Flawless',u:'keeps breached without a hit',t:[3,10,30,75,150],g:[15,30,60,120,250],v:()=>META.rec.flawless||0},
+  {id:'levels',name:'Ascension',u:'levels gained',t:[25,100,300,800,2000],g:[10,25,50,100,200],v:()=>(META.rec.levels||0)+(R&&!R.banked?R.lvl-1:0)},
+  {id:'gates',name:'Gatecrasher',u:'gate boosts',t:[1000,10000,50000,250000,1000000],g:[10,25,50,100,200],v:()=>(META.rec.gates||0)+live('gateN')},
+  {id:'bigs',name:'Big Shot',u:'Big One hits',t:[10,50,200,600,1500],g:[10,25,50,100,200],v:()=>(META.rec.bigs||0)+live('bigHits')},
+  {id:'relics',name:'Collector',u:'relics bought',t:[3,10,30,75,150],g:[10,25,50,100,200],v:()=>(META.rec.relicsB||0)+live('relicsBought')},
+  {id:'couriers',name:'Bounty Hunter',u:'couriers caught',t:[3,10,30,75,150],g:[10,25,50,100,200],v:()=>META.rec.couriers||0},
+];
+if(!META.mile)META.mile={};
+function mileCheck(){
+  let n=0,gems=0,last='';
+  for(const m of MILE){let lv=META.mile[m.id]||0;const v=m.v();while(lv<m.t.length&&v>=m.t[lv]){gems+=m.g[lv];n++;last=`${m.name} ${MROMAN[lv]}`;lv++}META.mile[m.id]=lv}
+  if(n){META.gems+=gems;saveMeta();toast(n>1?`${n} milestones reached  +${gems} gems`:`Milestone: ${last}  +${gems} gems`,2200,1);cue('ach')}
+}
+function achMeta(){const res=Object.values(META.shop||{}).reduce((a,b)=>a+b,0);if(res>=10)award('res10');
+  const bought=Object.entries(META.cos||{}).reduce((a,[k,v])=>a+v.filter(id=>{const it=(COS[k]||[]).find(x=>x.id===id);return it&&it.cost>0}).length,0);if(bought>=6)award('style6')}
 if(!META.ach)META.ach={};
 if(!META.rec)META.rec={runs:0,kills:0,forts:0,bestHit:0,bestLvl:0,biomes:{}};
 function award(id){if(META.ach[id])return;const a=ACH.find(x=>x.id===id);META.ach[id]=1;META.gems+=a.g;saveMeta();toast(`Achievement: ${a.name}  +${a.g} gems`,2000,1);cue('ach')}
 function checkAch(ev){
   if(!R||!S)return;const rec=META.rec;
-  if(ev==='fort'){award('f1');if(S.lv.boss)award('boss');if(!S.hitsThisFort)award('clean');if(!S.gatesLost)award('hold');
+  if(ev==='fort'){award('f1');if(S.lv.boss){award('boss');rec.bosses=(rec.bosses||0)+1}if(!S.hitsThisFort){award('clean');rec.flawless=(rec.flawless||0)+1}if(!S.gatesLost){award('hold');R.iron=(R.iron||0)+1;if(R.iron>=5)award('iron5')}
+    if(S.t<20)award('fast20');if(S.cannon.hp>0&&S.cannon.hp/S.st.maxHp<.1)award('thread');if((S.mortarN||0)>=10&&!S.mortarHit)award('shells');
     if(S.t>15&&(S.closeTime||0)/S.t>=.5)award('close50');if(S.t>20&&!S.wasClose)award('snipe');if(S.siege){award('siege');if(30-(S.sgT||0)<5)award('photo')}
     R.clean=S.hitsThisFort?0:(R.clean||0)+1;if(R.clean>=3)award('ghost');
     rec.facs=rec.facs||{};rec.facs[fac().id]=1;if(Object.keys(rec.facs).length>=6)award('xeno');
@@ -126,9 +164,10 @@ function checkAch(ev){
   if(S.L>=10)award('f10');if(S.L>=20)award('f20');
   const evos=EVO.filter(e=>lv_(e.id)).length;if(evos)award('evo');if(evos>=3)award('evo3');
   if(R.relics.some(id=>RELIC[id].x))award('exo');if(R.relics.some(id=>!RELIC[id].x&&has(id)===3))award('t3');
-  if(R.coins>=40)award('hoard');
+  if(R.coins>=40)award('hoard');if(R.coins>=100)award('hoard100');if(R.lvl>=50)award('lvl50');
   rec.biomes[biome().id]=1;if(Object.keys(rec.biomes).length>=6)award('world');
   if(rec.kills+R.kills>=10000)award('k10');
+  mileCheck();
 }
 if(!META.cos)META.cos={paint:['ocean'],blob:['aqua'],trail:['spark']};
 if(!META.sel)META.sel={paint:'ocean',blob:'aqua',trail:'spark'};

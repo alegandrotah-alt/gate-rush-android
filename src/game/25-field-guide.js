@@ -29,7 +29,7 @@ const GUIDE={
 };
 const GUIDE_ORDER=Object.keys(GUIDE);
 function guideSeen(id){return !!(META.guide&&META.guide[id])}
-function guide(id,force){if(!GUIDE[id]||typeof document==='undefined')return false;META.guide=META.guide||{};if(META.guide[id]&&!force)return false;META.guide[id]=1;saveMeta();
+function guide(id,force){if(!GUIDE[id]||typeof document==='undefined')return false;{const os=$('ovStart');if(os&&os.hidden===false)return false}META.guide=META.guide||{};if(META.guide[id]&&!force)return false;META.guide[id]=1;saveMeta();{const n=GUIDE_ORDER.filter(guideSeen).length;if(n>=13)award('guide13');if(n>=GUIDE_ORDER.length)award('guideall')}
   if(TUT&&TUT.busy&&!force)return true;toast(GUIDE[id].n,5200,2.5,id);return true}
 function guideFid(){return S&&S.L?fac().id:'robot'}
 function drawGuideIcon(cv,id){

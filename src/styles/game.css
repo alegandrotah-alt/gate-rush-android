@@ -303,3 +303,13 @@ button:focus-visible{outline:3px solid var(--ally-deep);outline-offset:3px}
 #guideCount{font:600 11px Barlow,sans-serif;color:#9fb0c0;letter-spacing:0;margin-left:6px}
 @media (prefers-reduced-motion:reduce){#coach .ca{animation:none}}
 .endhits{margin:6px 0 2px;font:500 13px/1.4 Barlow,sans-serif;color:#ffc4ca;text-transform:capitalize}.endhits b{font-family:Orbitron,sans-serif;font-size:10px;letter-spacing:.1em;color:#ff7a86;text-transform:uppercase;margin-right:6px}
+.miles{display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:left;margin-bottom:10px}
+.mile{border:1px solid rgba(95,225,255,.14);border-radius:8px;padding:7px 9px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:3px;min-width:0}
+.mile .mh{display:flex;justify-content:space-between;align-items:center;gap:4px}
+.mile b{font-family:Orbitron,var(--display),sans-serif;font-size:11.5px;color:#eaf8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mile .pips{display:flex;gap:2px;flex:none}.mile .pips i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15)}.mile .pips i.on{background:#ffcf2e;box-shadow:0 0 5px rgba(255,207,46,.7)}
+.mile .mbar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}.mile .mbar i{display:block;height:100%;background:linear-gradient(90deg,#2ab8e0,#7fe8ff)}
+.mile small{font-size:11.5px;color:#9fb0c0;line-height:1.25}.mile em{font-style:normal;font-family:Orbitron,sans-serif;font-size:10.5px;color:#e2bd6a}
+.mile.max{border-color:rgba(255,207,46,.45)}.mile.max .mbar i{background:linear-gradient(90deg,#ffcf2e,#fff0a8)}
+#mileCount,#achCount{font:600 11px Barlow,sans-serif;color:#9fb0c0;letter-spacing:0;margin-left:6px}
+#toast{z-index:40}

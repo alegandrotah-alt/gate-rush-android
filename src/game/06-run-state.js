@@ -127,7 +127,7 @@ function hurt(e,amt,melee){
   R.xp+=units*(1+.1*rank('xp'));
   if(S.st.vamp)heal(units*S.st.vamp*S.st.maxHp);
   if(e.w<=1e-6&&!e.dead){
-    e.dead=true;R.kills+=e.brute?10:1;if(e.courier&&e.courier.t>0){const n=3+Math.floor(S.L/3);R.coins+=n;sfxText(e.x,e.y-12,'+'+n+' COINS!','#ffcf2e',1);playS('coin',.8)||cue('taken');award('bounty')}if(wpn&&dm>1.3){R.weakKills=(R.weakKills||0)+1;if(R.weakKills>=300)award('weak300')}if(e.elite){R.elites=(R.elites||0)+1;META.rec.elites=(META.rec.elites||0)+1;award('elite1');if(META.rec.elites>=10)award('elite10');sfxText(e.x,e.y-20,'K.O.!','#ffcf2e',1);hitStop(.12);S.booms.push({x:e.x,y:e.y,r:60,life:.5});S.shake=Math.max(S.shake||0,10);cue('taken')}
+    e.dead=true;R.kills+=e.brute?10:1;if(e.courier&&e.courier.t>0){const n=3+Math.floor(S.L/3);R.coins+=n;sfxText(e.x,e.y-12,'+'+n+' COINS!','#ffcf2e',1);playS('coin',.8)||cue('taken');award('bounty');R.couriers=(R.couriers||0)+1;META.rec.couriers=(META.rec.couriers||0)+1;if(R.couriers>=3)award('courier3')}if(wpn&&dm>1.3){R.weakKills=(R.weakKills||0)+1;if(R.weakKills>=300)award('weak300')}if(e.elite){R.elites=(R.elites||0)+1;META.rec.elites=(META.rec.elites||0)+1;award('elite1');if(META.rec.elites>=10)award('elite10');sfxText(e.x,e.y-20,'K.O.!','#ffcf2e',1);hitStop(.12);S.booms.push({x:e.x,y:e.y,r:60,life:.5});S.shake=Math.max(S.shake||0,10);cue('taken')}
     if(melee===1){S.rage=Math.min(S.rage+(e.brute?5:1),40+40*lv_('berserk'));if(has('bloodmoon')){R.moon*=e.brute?1.01:1.002;S.moonDirty=1}}
     if(has('bloodlust')){const v=val('bloodlust');S.bl=Math.min(v[1],S.bl+v[0])}
     if(has('shrapnel')&&S.bursts.length<80)S.bursts.push({x:e.x,y:e.y,dmg:e.max*val('shrapnel'),r:e.brute?45:24});
@@ -165,7 +165,7 @@ function buzz(p){if(SET.vib&&navigator.vibrate)try{navigator.vibrate(p)}catch(e)
 const HITN={bullet:'BULLET',ringed:'RINGED BULLET',missile:'MISSILE',mortar:'MORTAR',laser:'LASER',bomber:'BOMBER BLAST',crash:'MINION CRASH',brute:'BRUTE CRASH',leak:'MINION GOT PAST',saws:'ELITE SAWS',ram:'ELITE RAM',drone:'ELITE DRONE',rift:'RIFT',mine:'MINE',meteor:'METEOR'};
 const HITGUIDE={mortar:'mortar',laser:'laser',leak:'leak',missile:'missile'};
 // a tag over your ride names what just hit you; the run keeps a tally for the end screen
-function hitTag(src,d){src=src||'bullet';S.hitTag={t:HITN[src]||src.toUpperCase(),d:Math.round(d),life:1.3};R.hitLog=R.hitLog||{};R.hitLog[src]=(R.hitLog[src]||0)+1;if(HITGUIDE[src])guide(HITGUIDE[src])}
+function hitTag(src,d){src=src||'bullet';if(src==='mortar')S.mortarHit=1;S.hitTag={t:HITN[src]||src.toUpperCase(),d:Math.round(d),life:1.3};R.hitLog=R.hitLog||{};R.hitLog[src]=(R.hitLog[src]||0)+1;if(HITGUIDE[src])guide(HITGUIDE[src])}
 function hitPlayer(d,src){
   const c=S.cannon;if(c.inv>0||S.over)return;
   S.lastHit=S.t;

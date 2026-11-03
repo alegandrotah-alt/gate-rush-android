@@ -1,8 +1,8 @@
 // ---------- first run: a short interactive tutorial that points at what matters ----------
 let TUT=null;
-function tutStart(){const co=$('coach'),ct=co&&co.querySelector&&co.querySelector('.ct');if(META.tut||!ct)return;TUT={step:0,t:0,busy:true,x0:S.cannon.x};$('coach').hidden=false}
-function tutEnd(){if(!TUT)return;TUT=null;META.tut=1;for(const id of ['gate','keep','bullets','lvl'])META.guide=Object.assign(META.guide||{},{[id]:1});saveMeta();$('coach').hidden=true}
-function tutSkip(){if(TUT){tutEnd();toast('Tutorial skipped. Cards in the Field Guide explain the rest.',2600,1)}}
+function tutStart(){const co=$('coach'),ct=co&&co.querySelector&&co.querySelector('.ct');if(META.tut||!ct)return;{const os=$('ovStart');if(os&&os.hidden===false)return}TUT={step:0,t:0,busy:true,x0:S.cannon.x};$('coach').hidden=false}
+function tutEnd(skipped){if(!TUT)return;if(!skipped)award('tut');TUT=null;META.tut=1;for(const id of ['gate','keep','bullets','lvl'])META.guide=Object.assign(META.guide||{},{[id]:1});saveMeta();$('coach').hidden=true}
+function tutSkip(){if(TUT){tutEnd(true);toast('Tutorial skipped. Cards in the Field Guide explain the rest.',2600,1)}}
 function coachAt(x,y,text,below){const el=$('coach'),st=$('stage').getBoundingClientRect(),cvr=cv.getBoundingClientRect();
   const X=x+cvr.left-st.left,Y=y+cvr.top-st.top;el.querySelector('.ct').textContent=text;el.classList.toggle('below',!!below);
   el.style.left=Math.max(8,Math.min(st.width-8,X))+'px';el.style.top=Y+'px';

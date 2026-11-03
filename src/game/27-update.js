@@ -45,7 +45,7 @@ function update(dt){
           // a fort-held gate gives you nothing but takes a push back toward you; the Big One retakes it outright
           gateCtl(g,u.big?2:.012*(1+Math.min(3,Math.log10(1+u.w/S.st.weight))),u.x);spark(u.x,g.y,'#8fe7ff',1);continue}
         if(isHeld(g))gateCtl(g,.004);
-        if(!g.follow){u.gates++;if(TUT)TUT.gate=1}
+        if(!g.follow){u.gates++;R.gateN=(R.gateN||0)+1;if(TUT)TUT.gate=1}
         if(g.t==='mul'){
           let v=gateMul(g);
           if(has('lucky')){const lv2=val('lucky');if(Math.random()<1/lv2[0]){v=Math.max(v,lv2[1]);popup(u.x,g.y,'LUCKY ×'+lv2[1],'#ffcf2e')}}

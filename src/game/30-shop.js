@@ -50,7 +50,7 @@ function drawShop(){
     b.disabled=sold||R.coins<price||full||(up&&own>=c.t);
     b.style.setProperty('--rc',TIERC[tt]);
     b.innerHTML=`<img class="ric" src="${iconFor(c.id,'relic',c.t)}" alt=""><span class="rar">${TIERN[tt]}${up?` · upgrade from ${ROMAN[own]}, pay the difference`:''}</span><b>${relicName(c.id,c.t)}</b><span>${relicDesc(c.id,c.t)}</span><em>${sold?'Bought':full?'Slots full':price+' coins'}</em>`;
-    b.addEventListener('click',()=>{if(b.disabled)return;R.coins-=price;buyRelic(c);checkAch('buy');SH.sold.push(i);blip(700,.08,'triangle',.05);renderOwned();drawShop()});
+    b.addEventListener('click',()=>{if(b.disabled)return;R.coins-=price;buyRelic(c);R.relicsBought=(R.relicsBought||0)+1;checkAch('buy');SH.sold.push(i);blip(700,.08,'triangle',.05);renderOwned();drawShop()});
     box.appendChild(b);
   });
   const pk=$('packBtn');pk.textContent=`Upgrade pack: pick 1 of 3 (${SH.pack} coins)`;pk.disabled=R.coins<SH.pack;
@@ -80,8 +80,8 @@ function runOver(quit){
   clearRun();
   S.over=true;S.running=false;MUS.mode='menu';
   const gems=R.forts*R.forts+R.forts*4;
-  checkAch('end');const rec=META.rec;rec.runs++;rec.kills+=Math.round(R.kills);rec.forts+=R.forts;rec.bestLvl=Math.max(rec.bestLvl,R.lvl);
-  META.gems+=gems;META.best=Math.max(META.best,R.forts);saveMeta();
+  checkAch('end');const rec=META.rec;rec.runs++;rec.kills+=Math.round(R.kills);rec.forts+=R.forts;rec.bestLvl=Math.max(rec.bestLvl,R.lvl);rec.levels=(rec.levels||0)+R.lvl-1;rec.bigs=(rec.bigs||0)+(R.bigHits||0);rec.relicsB=(rec.relicsB||0)+(R.relicsBought||0);rec.gates=(rec.gates||0)+(R.gateN||0);
+  META.gems+=gems;META.best=Math.max(META.best,R.forts);R.banked=true;saveMeta();mileCheck();
   $('endTitle').textContent=quit?`Retreated at gatekeep ${S.L}`:S.siege?`Overrun in the siege of gatekeep ${S.L}`:`Fallen at gatekeep ${S.L}`;
   const m=Math.floor(R.time/60),s=Math.floor(R.time%60);
   $('endStats').innerHTML=`<div><b>${R.forts}</b>forts destroyed</div><div><b>${R.lvl}</b>level reached</div><div><b>${fmt(R.kills)}</b>enemies crushed</div><div><b>${m}:${String(s).padStart(2,'0')}</b>run time</div>`;
