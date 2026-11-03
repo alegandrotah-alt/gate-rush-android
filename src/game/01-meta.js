@@ -121,6 +121,10 @@ const ACH=[
   {id:'res10',name:'Researcher',d:'Buy 10 research upgrades',g:30},
   {id:'style6',name:'Stylist',d:'Own 6 cosmetics you bought',g:30},
   {id:'courier3',name:'Hot Pursuit',d:'Catch 3 bounty couriers in one run',g:50},
+  {id:'tox1k',name:'Plague Bearer',d:'Kill 1,000 poisoned enemies in one run',g:50},
+  {id:'spread',name:'Patient Zero',d:'Spread toxin to 150 enemies with Contagion in one run',g:40},
+  {id:'ktox',name:'Rot from Within',d:'Let toxin land the final blow on a keep',g:40},
+  {id:'ktox50',name:'Toxic Citadel',d:'Poison a keep with 50 stacks of toxin at once',g:60},
   {id:'iron5',name:'Iron Wall',d:'Breach 5 keeps in one run without losing a gate in any of them',g:80},
 ];
 // milestones: lifetime goals with five levels each; every level pays gems, so steady play keeps paying out
@@ -138,6 +142,7 @@ const MILE=[
   {id:'gates',name:'Gatecrasher',u:'gate boosts',t:[1000,10000,50000,250000,1000000],g:[10,25,50,100,200],v:()=>(META.rec.gates||0)+live('gateN')},
   {id:'bigs',name:'Big Shot',u:'Big One hits',t:[10,50,200,600,1500],g:[10,25,50,100,200],v:()=>(META.rec.bigs||0)+live('bigHits')},
   {id:'relics',name:'Collector',u:'relics bought',t:[3,10,30,75,150],g:[10,25,50,100,200],v:()=>(META.rec.relicsB||0)+live('relicsBought')},
+  {id:'plague',name:'Plague Lord',u:'poisoned enemies killed',t:[200,1000,5000,25000,100000],g:[10,25,50,100,200],v:()=>(META.rec.toxKills||0)+live('toxKills')},
   {id:'couriers',name:'Bounty Hunter',u:'couriers caught',t:[3,10,30,75,150],g:[10,25,50,100,200],v:()=>META.rec.couriers||0},
 ];
 if(!META.mile)META.mile={};
@@ -155,10 +160,10 @@ function checkAch(ev){
   if(!R||!S)return;const rec=META.rec;
   if(ev==='fort'){award('f1');if(S.lv.boss){award('boss');rec.bosses=(rec.bosses||0)+1}if(!S.hitsThisFort){award('clean');rec.flawless=(rec.flawless||0)+1}if(!S.gatesLost){award('hold');R.iron=(R.iron||0)+1;if(R.iron>=5)award('iron5')}
     if(S.t<20)award('fast20');if(S.cannon.hp>0&&S.cannon.hp/S.st.maxHp<.1)award('thread');if((S.mortarN||0)>=10&&!S.mortarHit)award('shells');
-    if(S.t>15&&(S.closeTime||0)/S.t>=.5)award('close50');if(S.t>20&&!S.wasClose)award('snipe');if(S.siege){award('siege');if(30-(S.sgT||0)<5)award('photo')}
+    if(S.t>15&&(S.closeTime||0)/S.t>=.5)award('close50');if(S.t>20&&!S.wasClose)award('snipe');if(S.keepSrc==='tox')award('ktox');if(S.siege){award('siege');if(30-(S.sgT||0)<5)award('photo')}
     R.clean=S.hitsThisFort?0:(R.clean||0)+1;if(R.clean>=3)award('ghost');
     rec.facs=rec.facs||{};rec.facs[fac().id]=1;if(Object.keys(rec.facs).length>=6)award('xeno');
-    rec.rides=rec.rides||{};rec.rides[R.veh]=1;if(Object.keys(rec.rides).length>=6)award('pilot');
+    rec.rides=rec.rides||{};rec.rides[R.veh]=1;if(Object.keys(VEH).every(v=>rec.rides[v]))award('pilot');
     if(S.lv.boss){rec.mechs=rec.mechs||{};rec.mechs[S.mech]=1;if(Object.keys(rec.mechs).length>=3)award('mechs')}}
   if(ev==='fort'&&S.mods){if(S.mods.length>=2)award('cond2');if(S.mods.includes('twin'))award('twin')}
   if(R.lvl>=30)award('lvl30');if(R.relics.length>=6)award('relic6');

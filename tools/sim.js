@@ -9,7 +9,7 @@ const { buildFragment } = require('./build.js');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
 const RUNS = +arg('runs', 4);
-const RIDES = arg('rides', 'cannon,jet,tank,saucer,hive,robot').split(',');
+const RIDES = arg('rides', 'cannon,jet,tank,saucer,hive,robot,blight').split(',');
 const MAX_MIN = +arg('minutes', 14);
 const ALLSEC = { ghost: 1, abyss: 1, prism: 1, speed: 1, ascetic: 1, edge: 1, sovereign: 1 };
 
@@ -39,7 +39,7 @@ function runOnce(veh, seed, secrets, give) {
   vm.createContext(ctx);
   script.runInContext(ctx);
   const g = ctx.G; g.begin();
-  if (give) { Object.assign(g.R.ups, give); g.restat(); }
+  if (give) { const { _rt, ...ups } = give; Object.assign(g.R.ups, ups); if (_rt) Object.assign(g.R.rt, _rt); g.restat(); }
   let t = 0; const keeps = []; let died = null, err = null;
   try {
     for (let step = 0; step < 60 * 60 * MAX_MIN; step++) {
@@ -79,17 +79,21 @@ for (const veh of RIDES) for (let i = 0; i < RUNS; i++) results.push(runOnce(veh
 // crash test: one run with the whole secret arsenal forced in at full power
 const ARSENAL = { blade: 5, riftcut: 1, vortex: 5, horizon: 1, prism: 5, spectrum: 1, overdrive: 3, phase: 3, gatelord: 3, gravity: 3, channel: 3 };
 const arsenal = runOnce('jet', 4242, true, ARSENAL);
+// crash test: the whole damage-over-time kit maxed, with every toxin relic
+const PLAGUE = { venom: 5, plague: 1, spores: 5, bloom: 1, nanite: 5, greygoo: 1, virulence: 3, contagion: 3, catalyst: 3, wing: 3, echo: 3, _rt: { pathogen: 3, necrosis: 3, pandemic: 1 } };
+const plague = runOnce('blight', 777, false, PLAGUE);
 const secs = ((Date.now() - t0) / 1000).toFixed(1);
 
 const rows = RIDES.map((v) => {
   const rs = results.filter((r) => r.veh === v), c = rs.map((r) => r.cleared).sort((a, b) => a - b);
   return { v, avg: (c.reduce((a, b) => a + b, 0) / c.length).toFixed(1), med: c[c.length >> 1], max: c[c.length - 1], k1: rs.filter((r) => r.cleared >= 1).length, n: rs.length, errs: rs.filter((r) => r.err).length };
 });
-const errors = results.concat([arsenal]).filter((r) => r.err);
+const errors = results.concat([arsenal, plague]).filter((r) => r.err);
 const k1 = results.filter((r) => r.cleared >= 1).length / results.length;
 let md = `### Balance simulation\n${results.length} seeded bot runs in ${secs}s (bot steers toward × gates and dodges bullets; it plays worse than a person).\n\n| Ride | Avg keeps cleared | Median | Best | Cleared keep 1 | Crashes |\n|---|---|---|---|---|---|\n`;
 for (const r of rows) md += `| ${r.v} | ${r.avg} | ${r.med} | ${r.max} | ${r.k1}/${r.n} | ${r.errs} |\n`;
 md += `\nSecret arsenal crash test (every secret weapon and perk, maxed): ${arsenal.err ? '**crashed**' : `ran clean, cleared ${arsenal.cleared} keeps`}.\n`;
+md += `Toxin crash test (full damage-over-time kit and relics, with wingmen and echo): ${plague.err ? '**crashed**' : `ran clean, cleared ${plague.cleared} keeps`}.\n`;
 const fails = [];
 if (errors.length) fails.push(`${errors.length} run(s) crashed: ${errors[0].veh} seed ${errors[0].seed}: ${errors[0].err}`);
 if (k1 < .5) fails.push(`only ${(k1 * 100).toFixed(0)}% of runs cleared keep 1 (expected at least 50%)`);

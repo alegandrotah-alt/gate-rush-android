@@ -5,6 +5,7 @@ const VEH={
   jet:{name:'Zephyr',speed:340,hp:110,hit:6,fireInt:.07,shots:1,weight:.9,start:'missile',desc:'Jetpack ace in a sealed flight suit. Fast with a tiny hitbox, but fragile. Starts with Homing Missiles.'},
   tank:{name:'Bulwark',speed:160,hp:300,hit:14,fireInt:.11,shots:1,weight:1.5,start:'bomb',desc:'Mobile command fortress. Heavy shells, thick armor, slow to dodge. Starts with a Mortar.'},
   saucer:{name:'Nova',speed:270,hp:140,hit:9,fireInt:.08,shots:1,weight:1,start:'laser',desc:'Stealth saucer with a gyro cannon. Floaty and quick. Starts with a Laser beam.'},
+  blight:{name:'Blight',speed:250,hp:165,hit:10,fireInt:.09,shots:1,weight:1,start:'venom',desc:'Hazmat crop-duster with twin spray booms. Its shots poison whatever they hit, the keep included. Starts with a Venom Sprayer.'},
   hive:{name:'Buzz',speed:220,hp:190,hit:12,fireInt:.1,shots:1,weight:1,start:'drones',desc:'Armoured dropship with a drone bay. Its drones fire their own shots. Starts with 1 Drone.'},
 };
 

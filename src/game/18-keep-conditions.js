@@ -32,7 +32,7 @@ function modsInit(){
 }
 function liveTur(){return S.twin?TUR.filter(x=>x<200?S.twin.l>0:S.twin.r>0):TUR}
 function hitKeep(dmg,x){
-  S.lastKeepHit=S.t;
+  S.lastKeepHit=S.t;S.keepSrc=TOXHIT?'tox':'';
   if(S.twin){if(Math.abs(x-200)<22)return 0;const s=x<200?'l':'r';if(!(S.twin[s]>0))return 0;S.twin[s]-=dmg;S.baseHP=Math.max(0,S.twin.l)+Math.max(0,S.twin.r);
     if(!(S.twin[s]>0)&&!S.twin[s+'D']){S.twin[s+'D']=1;sfxText(s==='l'?110:290,S.fy+30,'HALF DOWN!','#ffcf2e',1);S.shake=Math.max(S.shake||0,10)}return dmg}
   S.baseHP-=dmg;return dmg;

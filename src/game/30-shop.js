@@ -86,7 +86,7 @@ function runOver(quit){
   clearRun();
   S.over=true;S.running=false;MUS.mode='menu';
   const gems=R.forts*R.forts+R.forts*4;
-  checkAch('end');const rec=META.rec;rec.runs++;rec.kills+=Math.round(R.kills);rec.forts+=R.forts;rec.bestLvl=Math.max(rec.bestLvl,R.lvl);rec.levels=(rec.levels||0)+R.lvl-1;rec.bigs=(rec.bigs||0)+(R.bigHits||0);rec.relicsB=(rec.relicsB||0)+(R.relicsBought||0);rec.gates=(rec.gates||0)+(R.gateN||0);
+  checkAch('end');const rec=META.rec;rec.runs++;rec.kills+=Math.round(R.kills);rec.forts+=R.forts;rec.bestLvl=Math.max(rec.bestLvl,R.lvl);rec.levels=(rec.levels||0)+R.lvl-1;rec.bigs=(rec.bigs||0)+(R.bigHits||0);rec.relicsB=(rec.relicsB||0)+(R.relicsBought||0);rec.gates=(rec.gates||0)+(R.gateN||0);rec.toxKills=(rec.toxKills||0)+(R.toxKills||0);
   META.gems+=gems;META.best=Math.max(META.best,R.forts);R.banked=true;saveMeta();mileCheck();
   $('endTitle').textContent=quit?`Retreated at gatekeep ${S.L}`:S.siege?`Overrun in the siege of gatekeep ${S.L}`:`Fallen at gatekeep ${S.L}`;
   const m=Math.floor(R.time/60),s=Math.floor(R.time%60);

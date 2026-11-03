@@ -30,6 +30,7 @@ function stats(){
     boomer:lv_('boomer'),glaive:lv_('glaive'),mines:lv_('mines'),minefield:lv_('minefield'),rail:lv_('rail'),massdriver:lv_('massdriver'),tesla:lv_('tesla'),reactor:lv_('reactor'),sentry:lv_('sentry'),fortress:lv_('fortress'),siphon:lv_('siphon'),guard:lv_('guard'),leechCap:(has('vampeng')?val('vampeng')[1]:0)+.02*lv_('siphon'),
     wing:lv_('wing'),kami:lv_('kami'),echo:lv_('echo'),hair:lv_('hair'),ricochet:lv_('ricochet'),channel:lv_('channel'),gravity:lv_('gravity'),absorb:lv_('absorb'),volatile:lv_('volatile'),cryo:lv_('cryo'),burn:lv_('burn'),
     blade:lv_('blade'),riftcut:lv_('riftcut'),vortex:lv_('vortex'),horizon:lv_('horizon'),prism:lv_('prism'),spectrum:lv_('spectrum'),overdrive:lv_('overdrive'),phase:lv_('phase'),gatelord:lv_('gatelord'),
+    venom:lv_('venom'),plague:lv_('plague'),spores:lv_('spores'),bloom:lv_('bloom'),nanite:lv_('nanite'),greygoo:lv_('greygoo'),virulence:lv_('virulence'),contagion:lv_('contagion'),catalyst:lv_('catalyst'),
   };
 }
 function restat(){const before=S.st.maxHp;S.st=stats();S.cannon.hp=Math.min(S.st.maxHp,S.cannon.hp+Math.max(0,S.st.maxHp-before))}
@@ -40,7 +41,7 @@ function startFort(L,fresh){
   const prevF=S&&S.fac;let fc=rnd(FACL);while(fc===prevF)fc=rnd(FACL);
   if(has('alchemy'))for(const g of lv.gates)if(g.t==='add'){const t=has('alchemy');if(t===1)g.v*=2;else{g.t='mul';g.v=t===2?Math.ceil(g.v/2)+1:g.v}}
   S={L,lv,t:0,running:false,over:false,players:[],enemies:[],sparks:[],bolts:[],booms:[],shells:[],bursts:[],
-     bul:[],lasers:[],emit:[],decals:[],vfx:[],props:[],sent:[],tracers:[],orbs:[],arts:[],miss:[],pend:[],charge:0,hitsThisFort:0,sawp:[],traps:[],boomr:[],mine:[],rails:[],pulses:[],kamis:[],trail:[],echoQ:[],beams:[],cones:[],voids:[],prisms:[],slashes:[],waves:[],wings:[],caught:0,kamiT:3,trailT:0,burnMineT:0,firedW:0,lastHit:-9,rage:0,pips:0,pipT:0,healLeft:0,
+     bul:[],lasers:[],emit:[],decals:[],vfx:[],props:[],sent:[],tracers:[],orbs:[],arts:[],miss:[],pend:[],charge:0,hitsThisFort:0,sawp:[],traps:[],boomr:[],mine:[],rails:[],pulses:[],kamis:[],trail:[],echoQ:[],beams:[],cones:[],voids:[],prisms:[],slashes:[],waves:[],mist:[],pods:[],clouds:[],darts:[],toxLinks:[],ktox:0,ktoxT:0,ktoxA:0,kgoo:0,wings:[],caught:0,kamiT:3,trailT:0,burnMineT:0,firedW:0,lastHit:-9,rage:0,pips:0,pipT:0,healLeft:0,
      baseHP:lv.baseHP,baseMax:lv.baseHP,baseShake:0,fy:BASE_Y,ate:0,streamT:.5,atkT:1.8,
      cannon:{x:200,y:610,tx:200,ty:610,hp:0,cool:0,charge:0,inv:0,tm:{}},
      biome:bm,fac:fc,fw:174,mech:lv.mech||'',eliteT:L===1?15:9+Math.random()*6,shieldUp:false,waveT:5,waveN:0,keys:{},zapT:1,bombT:2,st:stats(),uw:lv.unitW,surge:0,siege:false,bl:0,gz:0,hurtBuff:0,popups:[]};
@@ -121,6 +122,7 @@ function hurt(e,amt,melee){
   const wpn=!!melee;
   if(wpn&&S.st.cryo&&e.w>0)e.slowT=2;
   if(e.w<=0)return 0;const dm=dmod(e,!wpn);amt*=dm;if(wpn)amt*=clsMul();
+  let xm=1;if(S.st.catalyst&&e.tox>0)xm=1+Math.min(e.tox,15)*[0,.03,.05,.07][S.st.catalyst];amt*=xm;if(!wpn&&(S.st.catalyst||R.veh==='blight')&&S.t-(e.catT??-9)>.25){e.catT=S.t;afflict(e,1)}
   if(wpn&&dm>1.3&&S.t-(S.weakT??-9)>.45){S.weakT=S.t;sfxText(e.x,e.y-12,'WEAK!',DTC[DTY],1)}else if(wpn&&dm<.7&&S.t-(S.resT??-9)>1.4){S.resT=S.t;popup(e.x,e.y-12,'resisted','#8a98a8')}
   const d=Math.min(e.w,amt);e.w-=d;
   if(has('mirrorfort'))hitKeep(d*val('mirrorfort'),e.x);
@@ -135,11 +137,12 @@ function hurt(e,amt,melee){
     if(has('shrapnel')&&S.bursts.length<80)S.bursts.push({x:e.x,y:e.y,dmg:e.max*val('shrapnel'),r:e.brute?45:24});
     if(has('midas')){const q=val('midas');R.midasN+=e.brute?q:1;while(R.midasN>=q){R.midasN-=q;R.coins++;popup(e.x,e.y,'+1¢','#ffcf2e')}}
     if(has('phoenix')){R.phoenixN+=e.brute?10:1;if(R.phoenixN>=100){R.phoenixN-=100;heal(S.st.maxHp*val('phoenix'))}}
+    if(e.tox>0)toxDeath(e);
     if(e.t)foeDies(e);
     if(wpn&&S.st.volatile&&S.bursts.length<120)S.bursts.push({x:e.x,y:e.y,dmg:e.max*[.25,.4,.6][S.st.volatile-1],r:e.brute?50:30,wpn:1});
     if(e.brute){spark(e.x,e.y,'#ffcf2e',24);blip(110,.25,'sawtooth',.06)}
   }
-  return d/dm;
+  return d/dm/xm;
 }
 function popcount(m){let c=0;while(m){c+=m&1;m>>>=1}return c}
 function fortMult(){
@@ -158,7 +161,7 @@ function fortHit(u){
   if(has('daredevil'))m*=1+val('daredevil')*clamp(1-(S.cannon.y-S.fy-50)/(Y_MAX-200),0,1);
   if(has('polychrome'))m*=Math.pow(1.5,R.relics.length);
   m*=dmgMult()*shieldMul();
-  const dmg=u.w*m;hitKeep(dmg,u.x);if(!(dmg<Infinity)&&!S.twin)S.baseHP=-Infinity;
+  const dmg=u.w*m;hitKeep(dmg,u.x);if(R.veh==='blight'||S.st.catalyst)afflictKeep(.12,0,Math.min(8,Math.pow(2,u.gates||0)));if(!(dmg<Infinity)&&!S.twin)S.baseHP=-Infinity;
   if(dmg>META.rec.bestHit){META.rec.bestHit=dmg;if(dmg>=1e6)award('mil')}
   if(has('snowball')){const before=Math.floor(R.snowHits/150);R.snowHits++;if(Math.floor(R.snowHits/150)>before){restat();popup(200,S.fy+20,'Snowball!','#8fe7ff')}}
   return dmg;

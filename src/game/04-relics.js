@@ -32,6 +32,8 @@ const RELICS=[
   {id:'overwatch',name:'Overwatch',v:[.25,.5,.9],d:v=>`Hold still for a moment: +${pct(v)} fire rate and weapon recharge until you move.`},
   {id:'artillery',name:'Artillery Doctrine',v:[1.4,1.9,2.8],d:v=>`Long range: Mortar and Missile damage ×${v}, anywhere.`},
   {id:'servos',name:'Overclocked Servos',v:[1.5,2.5,4],d:v=>`Engineer: turrets, drones and mines deal ${v}× damage.`},
+  {id:'pathogen',name:'Pathogen',v:[1.5,2.5,4],d:v=>`Damage over time: toxin deals ${v}× damage, to enemies and to the keep.`},
+  {id:'necrosis',name:'Necrosis',v:[.2,.35,.5],d:v=>`Damage over time: poisoned enemies move ${pct(v)} slower.`},
   {id:'rally',name:'Rally Point',v:[.01,.02,.035],d:v=>`Engineer: flying next to one of your turrets repairs ${(v*100).toFixed(1)}% HP per second (from your repair budget).`},
   {id:'gateeng',name:'Gate Engineer',v:[[1,0],[1,1],[2,1]],d:v=>`Gates you hold multiply by ${v[0]} more${v[1]?' and lose control half as fast':''}.`},
   {id:'switch',name:'Switch Hitter',v:[.3,.6,1],d:v=>`Moving into close or long range gives +${pct(v)} damage for 3s.`},
@@ -45,6 +47,7 @@ const RELICS=[
   {id:'undying',name:'Undying Rage',x:1,d:()=>'Close range: a hit that would kill you leaves you at 1 HP instead. Recharges after 20s.'},
   {id:'orbital',name:'Orbital Lance',x:1,d:()=>'Every 9s an orbital beam strikes the thickest crowd for 30× your blob power and hits the keep for 40×.'},
   {id:'vonneumann',name:'Von Neumann',x:1,d:()=>'+2 turret cap. Turrets rebuild themselves once when they expire or break.'},
+  {id:'pandemic',name:'Pandemic',x:1,d:()=>'Poisoned enemies that die pass all their toxin to every enemy nearby, toxin stacks 10 higher, and it never wears off the keep.'},
   {id:'polychrome',name:'Polychrome',x:1,d:()=>'Blobs hit the fort ×1.5 harder for every relic you own. Compounds.'},
 ];
 const RELIC={};RELICS.forEach(r=>RELIC[r.id]=r);

@@ -19,6 +19,9 @@ const UP=[
   {id:'blade',kind:'w',name:'Phase Blade',ic:'⟋',cat:'wpn',max:5,syn:['gravity','absorb'],secret:'edge',d:l=>l===0?'Sweeps a blade of light in front of you, cutting enemies and plain bullets':'Wider, faster, harder sweeps'},
   {id:'vortex',kind:'w',name:'Singularity',ic:'◎',cat:'wpn',max:5,syn:['gravity','volatile'],secret:'abyss',d:l=>l===0?'Launches a black hole into the thickest crowd. It drags enemies and plain bullets in, then collapses in a blast':'Stronger pull, harder collapse, more often'},
   {id:'prism',kind:'w',name:'Prism Lance',ic:'⟁',cat:'wpn',max:5,syn:['channel','echo'],secret:'prism',d:l=>l===0?'Fires a piercing lance of light. Every × gate it crosses multiplies it and splits off two more lances':'Faster, hotter lances'},
+  {id:'venom',kind:'w',name:'Venom Sprayer',ic:'☣',cat:'wpn',max:5,syn:['virulence','contagion'],d:l=>l===0?'Sprays toxic mist up the road. Every puff poisons what it touches, and puffs that cross a × gate poison that many times over':'Faster spray, longer reach, stronger toxin'},
+  {id:'spores',kind:'w',name:'Spore Pods',ic:'❦',cat:'wpn',max:5,syn:['contagion','catalyst'],d:l=>l===0?'Lobs a pod into the thickest crowd. It bursts into a toxic cloud that keeps poisoning everything inside, the keep too if it lands close':'Bigger clouds that last longer, more often'},
+  {id:'nanite',kind:'w',name:'Nanite Darts',ic:'⁂',cat:'wpn',max:5,syn:['virulence','catalyst'],d:l=>l===0?'Fires a dart into the heaviest enemy, packed with toxin. When the host dies the nanites jump to the next one':'More toxin per dart, faster darts'},
   // perks: change how things play
   {id:'wing',kind:'p',name:'Wingmen',ic:'⋈',cat:'perk',max:3,d:l=>`${l+2} escort drones fly with you, each running a copy of every weapon you own at ${30+10*(l+1)}% damage.`},
   {id:'kami',kind:'p',name:'Kamikaze',ic:'☄',cat:'perk',max:3,d:l=>`Every ${[6,4.5,3][l]}s a suicide drone dives into the thickest crowd, or the fort if it's clear. Hits harder for every weapon you own.`},
@@ -34,6 +37,9 @@ const UP=[
   {id:'overdrive',kind:'p',name:'Overdrive',ic:'≫!',cat:'perk',max:3,secret:'speed',d:l=>`Every 10s your weapons overdrive for ${[3,4,5][l]}s: they recharge twice as fast and hit ${[40,60,80][l]}% harder.`},
   {id:'phase',kind:'p',name:'Phase Shift',ic:'◌',cat:'perk',max:3,secret:'ghost',d:l=>`Phase straight through one hit, once every ${[9,7,5][l]}s.`},
   {id:'gatelord',kind:'p',name:'Gate Lord',ic:'×↑',cat:'perk',max:3,secret:'ascetic',d:l=>`× gates grow by 1 for every ${[60,45,30][l]} shots that pass through them, up to +${l+1} each per keep.`},
+  {id:'virulence',kind:'p',name:'Virulence',ic:'☠',cat:'perk',max:3,d:l=>`Toxin ticks ${[30,60,100][l]}% harder, lasts ${l+1}s longer and stacks ${4*(l+1)} higher, on enemies and on the keep.`},
+  {id:'contagion',kind:'p',name:'Contagion',ic:'⁘',cat:'perk',max:3,d:l=>`Poisoned enemies that die pass ${['half','three-quarters','all'][l]} of their toxin to the ${l+2} closest enemies.`},
+  {id:'catalyst',kind:'p',name:'Catalyst',ic:'⚗',cat:'perk',max:3,d:l=>`Your blobs carry toxin and poison what they hit, the keep included. Poisoned enemies take +${[3,5,7][l]}% damage from everything for each stack.`},
   // boosts: stats, no slot
   {id:'rapid',kind:'b',name:'Rapid Fire',ic:'»',cat:'can',max:5,d:l=>'+15% fire rate'},
   {id:'twin',kind:'b',name:'Extra Barrel',ic:'‖',cat:'can',max:3,d:l=>'+1 blob per shot'},
@@ -68,6 +74,9 @@ const EVO=[
   {id:'riftcut',w:'blade',name:'Riftcutter',ic:'⟋⟋',d:'Faster, wider sweeps that cut outlined bullets too, and every sweep sends a rift wave up the road that rides your × gates into the keep.'},
   {id:'horizon',w:'vortex',name:'Event Horizon',ic:'◎◎',d:'Two singularities at a time, half again as big. They swallow outlined bullets too, and every collapse fires the crushed horde back as one heavy blob.'},
   {id:'spectrum',w:'prism',name:'Spectrum',ic:'⟁⟁',d:'Lances split up to three times, every split keeps the full multiplier, and they erase plain bullets on the way.'},
+  {id:'plague',w:'venom',name:'Plague Engine',ic:'☣☣',d:'The spray becomes a towering plume that reaches the keep and poisons it. Puffs poison twice as hard, and poisoned enemies that die burst into toxic clouds.'},
+  {id:'bloom',w:'spores',name:'Bloom',ic:'❦❦',d:'Two pods a volley, half again as big. Clouds drift up the road, cling to the keep wall and poison it hard.'},
+  {id:'greygoo',w:'nanite',name:'Grey Goo',ic:'⁂⁂',d:'Every other dart skips the horde, flies through your × gates and injects the keep, multiplied by every gate it crossed. Grey Goo never wears off the keep.'},
   {id:'fortress',w:'sentry',name:'Fortress Protocol',ic:'▲▲',d:'Turrets stay until the keep falls, deploy every 3s up to 8, take twice the hits and fire double shots twice as fast.'},
 ];
 // late-game limit breaks: one of each, offered once you're strong

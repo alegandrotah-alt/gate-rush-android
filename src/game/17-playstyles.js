@@ -2,13 +2,14 @@
 // Close range = within 150 of the keep's wall (the orange band). Long range = behind the cyan line, 290+ from the wall.
 const CLOSE_D=190,LONG_D=330;
 let WCL='';
-const WCLS={orbit:'close',flame:'close',shield:'close',tesla:'close',boomer:'close',zap:'long',bomb:'long',missile:'long',laser:'long',rail:'long',drones:'eng',mines:'eng',sentry:'eng',vortex:'long',prism:'long',blade:'close'};
-const PCLS={gravity:'close',absorb:'close',burn:'close',channel:'long',ricochet:'long',echo:'long',kami:'eng',wing:'eng',hair:'',volatile:'',cryo:'',overdrive:'',phase:'',gatelord:''};
-const CLN={close:'Close range',long:'Long range',eng:'Engineer'},CLC={close:'#ffa050',long:'#5fe1ff',eng:'#7dffb0'};
+const WCLS={orbit:'close',flame:'close',shield:'close',tesla:'close',boomer:'close',zap:'long',bomb:'long',missile:'long',laser:'long',rail:'long',drones:'eng',mines:'eng',sentry:'eng',vortex:'long',prism:'long',blade:'close',venom:'dot',spores:'dot',nanite:'dot'};
+const PCLS={gravity:'close',absorb:'close',burn:'close',channel:'long',ricochet:'long',echo:'long',kami:'eng',wing:'eng',hair:'',volatile:'',cryo:'',overdrive:'',phase:'',gatelord:'',virulence:'dot',contagion:'dot',catalyst:'dot'};
+const CLN={close:'Close range',long:'Long range',eng:'Engineer',dot:'Damage over time'},CLC={close:'#ffa050',long:'#5fe1ff',eng:'#7dffb0',dot:'#a6ff4a'};
 function clsMul(){let m=1;
   if(WCL==='close'){if(S.zone==='close')m*=1.35}
   else if(WCL==='long'){if(S.zone==='long')m*=1.25*(has('scope')?val('scope'):1);if(DTY==='exp'&&has('artillery'))m*=val('artillery')}
   else if(WCL==='eng'){if(has('servos'))m*=val('servos')}
+  else if(WCL==='dot'){if(has('pathogen'))m*=val('pathogen')}
   if(S.swT>0&&has('switch'))m*=1+val('switch');
   return m}
 // close-range lifesteal ignores the repair budget, but is capped per second

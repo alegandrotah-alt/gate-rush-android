@@ -1,7 +1,7 @@
-// ---------- 3D-rendered models: CC0 Kenney Space Kit, Kenney Tower Defense Kit, KayKit Space Base and KayKit Combat Mech,
+// ---------- 3D-rendered models: CC0 Kenney Space Kit (Blight is its mining craft), Kenney Tower Defense Kit, KayKit Space Base and KayKit Combat Mech,
 // re-skinned in sleek gunmetal with glowing trim and pre-rendered to sprite sheets (gfx3d/). Sheets load on demand,
 // each frame is cached once at the size it is drawn so a big source image is never scaled per frame.
-const G3RIDES=['cannon','jet','tank','saucer','hive','robot'];
+const G3RIDES=['cannon','jet','tank','saucer','hive','robot','blight'];
 const G3PAINTS=['ocean','crimson','jade','royal','sunset','sakura','toxic','midnight','arctic','inferno','void','gold'];
 const G3FOES=['base','runner','gunner','splitter','armored','bomber','saboteur','phantom','totem'];
 const G3D={base:'gfx3d/',img:{},st:{},mip:{},n:0};

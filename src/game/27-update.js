@@ -143,7 +143,7 @@ function update(dt){
   for(const e of S.enemies){
     if(e.elite){eliteTick(e,dt);continue}if(e.dr){droneTick(e,dt);continue}if(e.pylon){pylonTick(e,dt);continue}if(e.courier){courierTick(e,dt);continue}
     const r=radius(e.w,e.brute);e.wob+=dt*6;
-    const slow=e.slowT>0?1-[0,.3,.45,.6][st.cryo]:1;if(e.slowT>0)e.slowT-=dt;
+    const slow=(e.slowT>0?1-[0,.3,.45,.6][st.cryo]:1)*(e.tox>0&&has('necrosis')?1-val('necrosis'):1);if(e.slowT>0)e.slowT-=dt;
     let vx=Math.sin(e.wob)*6,vy=e.sp;
     if(!wall||e.y>wall.y2){const dx=c.x-e.x,dy=c.y-e.y,d=Math.hypot(dx,dy),pull=e.t==='runner'?260:170;if(d<pull&&dy>-20){vx+=dx/d*e.sp*.7;vy=vy*.5+dy/d*e.sp*.6}else vx+=dx*(e.brute?.3:.06)}
     if(e.stopY!=null&&e.y>=e.stopY){vy=0;vx=Math.sin(e.wob*.3)*14}
@@ -196,6 +196,7 @@ function update(dt){
   S.beams=[];S.cones=[];
   for(const src of srcList())weaponsTick(src,W);
   sentryTick(dt,W);
+  toxTick(dt,W);
   // echoes
   for(const q of S.echoQ)q.t-=dt;const due=S.echoQ.filter(q=>q.t<=0);S.echoQ=S.echoQ.filter(q=>q.t>0);for(const q of due)q.fn();
   DTY='kin';WCL='close';// launched saws (Saw Storm)

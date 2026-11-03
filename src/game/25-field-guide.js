@@ -25,6 +25,7 @@ const GUIDE={
   laser:{n:'Laser beams',d:'A thin red stripe warns where a beam will fire. Slide sideways out of the stripe.'},
   missile:{n:'Homing missiles',d:'They curve toward you. Keep moving and cut sideways at the last moment.'},
   leak:{n:'Minions getting past',d:'Minions that slip past you to the bottom of the road hit your ride. Crush them before they get through.'},
+  toxin:{n:'Toxin',d:'Green bubbling enemies are poisoned. Toxin stacks, ticks every moment, hits harder the longer it lasts and is never resisted. Stop topping it up and it wears off.'},
   lvl:{n:'Level-ups',d:'Crushing enemies earns XP. Level-ups wait behind the +LVL button until you want them.'},
 };
 const GUIDE_ORDER=Object.keys(GUIDE);
@@ -52,6 +53,7 @@ function drawGuideIcon(cv,id){
   if(id==='laser'){g.fillStyle='rgba(255,46,99,.35)';g.fillRect(W2*.42,0,W2*.16,H2);g.fillStyle='rgba(255,190,210,.9)';g.fillRect(W2*.48,0,W2*.04,H2);return}
   if(id==='missile'){const c3=g3cell('q_missile',160,2,0,W2);if(c3)put(c3);else txt('➶','#ff4a4a',W2*.5);return}
   if(id==='leak'){txt('▼','#ff5a5a',W2*.5);return}
+  if(id==='toxin'){const gl=g.createRadialGradient(W2/2,H2/2,2,W2/2,H2/2,W2*.45);gl.addColorStop(0,'rgba(166,255,74,.55)');gl.addColorStop(1,'rgba(166,255,74,0)');g.fillStyle=gl;g.fillRect(0,0,W2,H2);const c3=g3cell('q_blight',160,0,1,W2);if(c3)put(c3,0,0,0,0,W2*1.2);else txt('☣','#a6ff4a',W2*.5);return}
   if(id==='lvl'){g.fillStyle='#2ab8e0';g.beginPath();g.roundRect(W2*.15,H2*.36,W2*.7,H2*.28,H2*.14);g.fill();txt('+1 LVL','#041018',W2*.15);return}
 }
 function showCard(m){const el=$('guide'),G=GUIDE[m.card],bq=el&&el.querySelector&&el.querySelector('b');if(!el||!G||!bq){MSGON=null;return}

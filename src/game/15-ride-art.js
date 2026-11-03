@@ -6,6 +6,7 @@ const VEHPAL={
   tank:{p:['#1c2210','#4a5628','#929a64'],a:'#9a763a',o:'#060804',iris:'#ffb43a'},
   saucer:{p:['#1a1228','#4e3670','#a890c8'],a:'#38c09a',o:'#05030a',iris:'#3affd0'},
   hive:{p:['#241600','#a8781a','#dcc070'],a:'#14100a',o:'#080500',iris:'#ff3a2a'},
+  blight:{p:['#1e2a0a','#8cb82e','#d8ff7a'],a:'#7a3ad0',o:'#060a02',iris:'#c27aff'},
 };
 function animeEye(g,x,y,rw,rh,iris,mood,side){
   rh*=.72;g.fillStyle='#e8e2d8';g.beginPath();g.ellipse(x,y,rw,rh,0,0,6.283);g.fill();

@@ -124,7 +124,7 @@ button:focus-visible{outline:3px solid var(--ally-deep);outline-offset:3px}
 .sw small{font-size:11px}
 .sw.on{background:var(--ally);box-shadow:0 3px 0 var(--ink)}
 .sw.locked{opacity:.85;border-style:dashed}
-.vehs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.vehs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .veh{display:flex;flex-direction:column;align-items:center;gap:1px;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:4px 4px 6px;cursor:pointer;color:var(--ink);min-width:0}
 .veh canvas{width:72px;height:56px;max-width:100%}
 .veh b{font-family:var(--display);font-weight:400;font-size:14px;line-height:1.1}

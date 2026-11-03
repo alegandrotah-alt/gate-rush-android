@@ -93,6 +93,7 @@ function weaponsTick(o,W){
     for(const e of S.enemies){if(e.w>0&&(e.x-o.x)**2+(e.y-o.y)**2<(r+radius(e.w,e.brute))**2)hurt(e,dmg,2)}
     const br=st.reactor?r:r*.6;for(const b of S.bul){if(b.life<=0)continue;const d2=(b.x-o.x)**2+(b.y-o.y)**2;if((st.reactor||!b.hard)&&d2<br*br)killBullet(b);else if(st.cryo&&!b.hard&&d2<r*r)b.frz=1}
     S.pulses.push({x:o.x,y:o.y,r,life:.3});(playS('zap',.18,1.3+Math.random()*.3)||blip(1500,.04,'square',.02))});
+  toxWeapons(o,W,P,tm);
 }
 
 function densest(){const alive=S.enemies.filter(e=>e.w>0);if(!alive.length)return null;let best=null,bs=-1;for(let i=0;i<12;i++){const e=rnd(alive);let s2=0;for(const f of alive){const dx=f.x-e.x,dy=f.y-e.y;if(dx*dx+dy*dy<1600)s2+=f.w}if(s2>bs){bs=s2;best=e}}return best}
