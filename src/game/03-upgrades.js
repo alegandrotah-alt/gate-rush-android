@@ -16,6 +16,9 @@ const UP=[
   {id:'rail',kind:'w',name:'Railgun',ic:'⇡',cat:'wpn',max:5,syn:['channel','hair'],d:l=>l===0?'Charges, then fires a piercing line all the way to the fort':'Faster charge, more damage'},
   {id:'tesla',kind:'w',name:'Tesla Coil',ic:'ϟ',cat:'wpn',max:5,syn:['absorb','echo'],d:l=>l===0?'Pulses lightning around you and fries plain bullets':'Wider, faster pulses'},
   {id:'sentry',kind:'w',name:'Sentry Turret',ic:'▲',cat:'wpn',max:5,syn:['hair','absorb'],d:l=>l===0?'Deploys a turret where you fly. It shoots the nearest enemy (or the keep, if planted close), soaks plain bullets and lasts 12s':'+1 turret, faster deploys, more damage'},
+  {id:'blade',kind:'w',name:'Phase Blade',ic:'⟋',cat:'wpn',max:5,syn:['gravity','absorb'],secret:'edge',d:l=>l===0?'Sweeps a blade of light in front of you, cutting enemies and plain bullets':'Wider, faster, harder sweeps'},
+  {id:'vortex',kind:'w',name:'Singularity',ic:'◎',cat:'wpn',max:5,syn:['gravity','volatile'],secret:'abyss',d:l=>l===0?'Launches a black hole into the thickest crowd. It drags enemies and plain bullets in, then collapses in a blast':'Stronger pull, harder collapse, more often'},
+  {id:'prism',kind:'w',name:'Prism Lance',ic:'⟁',cat:'wpn',max:5,syn:['channel','echo'],secret:'prism',d:l=>l===0?'Fires a piercing lance of light. Every × gate it crosses multiplies it and splits off two more lances':'Faster, hotter lances'},
   // perks: change how things play
   {id:'wing',kind:'p',name:'Wingmen',ic:'⋈',cat:'perk',max:3,d:l=>`${l+2} escort drones fly with you, each running a copy of every weapon you own at ${30+10*(l+1)}% damage.`},
   {id:'kami',kind:'p',name:'Kamikaze',ic:'☄',cat:'perk',max:3,d:l=>`Every ${[6,4.5,3][l]}s a suicide drone dives into the thickest crowd, or the fort if it's clear. Hits harder for every weapon you own.`},
@@ -28,6 +31,9 @@ const UP=[
   {id:'volatile',kind:'p',name:'Volatile',ic:'✺',cat:'perk',max:3,d:l=>`Enemies your weapons kill explode for ${[25,40,60][l]}% of their weight. Explosions can chain.`},
   {id:'cryo',kind:'p',name:'Cryo',ic:'❄',cat:'perk',max:3,d:l=>`Weapon hits slow enemies ${[30,45,60][l]}%. Orbs, Tesla and lasers freeze plain bullets in place.`},
   {id:'burn',kind:'p',name:'Afterburn',ic:'≋',cat:'perk',max:3,d:l=>`Flying leaves a fire trail that burns enemies and plain bullets for ${[1.5,2,2.5][l]}s. Mine Layer drops mines along it.`},
+  {id:'overdrive',kind:'p',name:'Overdrive',ic:'≫!',cat:'perk',max:3,secret:'speed',d:l=>`Every 10s your weapons overdrive for ${[3,4,5][l]}s: they recharge twice as fast and hit ${[40,60,80][l]}% harder.`},
+  {id:'phase',kind:'p',name:'Phase Shift',ic:'◌',cat:'perk',max:3,secret:'ghost',d:l=>`Phase straight through one hit, once every ${[9,7,5][l]}s.`},
+  {id:'gatelord',kind:'p',name:'Gate Lord',ic:'×↑',cat:'perk',max:3,secret:'ascetic',d:l=>`× gates grow by 1 for every ${[60,45,30][l]} shots that pass through them, up to +${l+1} each per keep.`},
   // boosts: stats, no slot
   {id:'rapid',kind:'b',name:'Rapid Fire',ic:'»',cat:'can',max:5,d:l=>'+15% fire rate'},
   {id:'twin',kind:'b',name:'Extra Barrel',ic:'‖',cat:'can',max:3,d:l=>'+1 blob per shot'},
@@ -59,6 +65,9 @@ const EVO=[
   {id:'minefield',w:'mines',name:'Minefield',ic:'✷✷',d:'Mines rain across the whole road. Blasts chain into nearby mines, each link hitting 25% harder, and leave saw traps.'},
   {id:'massdriver',w:'rail',name:'Mass Driver',ic:'⇡⇡',d:'Fires every 1.2s. The shot multiplies by every × gate in its line and hits the fort with all of it.'},
   {id:'reactor',w:'tesla',name:'Arc Reactor',ic:'ϟ@',d:'Pulses twice as wide, twice as often, and erase every bullet in range, outlined ones too.'},
+  {id:'riftcut',w:'blade',name:'Riftcutter',ic:'⟋⟋',d:'Faster, wider sweeps that cut outlined bullets too, and every sweep sends a rift wave up the road that rides your × gates into the keep.'},
+  {id:'horizon',w:'vortex',name:'Event Horizon',ic:'◎◎',d:'Two singularities at a time, half again as big. They swallow outlined bullets too, and every collapse fires the crushed horde back as one heavy blob.'},
+  {id:'spectrum',w:'prism',name:'Spectrum',ic:'⟁⟁',d:'Lances split up to three times, every split keeps the full multiplier, and they erase plain bullets on the way.'},
   {id:'fortress',w:'sentry',name:'Fortress Protocol',ic:'▲▲',d:'Turrets stay until the keep falls, deploy every 3s up to 8, take twice the hits and fire double shots twice as fast.'},
 ];
 // late-game limit breaks: one of each, offered once you're strong

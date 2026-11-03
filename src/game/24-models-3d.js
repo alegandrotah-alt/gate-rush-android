@@ -24,13 +24,13 @@ function g3cell(name,cell,col,row,want){
 const G3DPR=()=>(typeof DPR==='number'?DPR:1);
 function g3paint(){const p=cosSel('paint');return p&&G3PAINTS.includes(p.id)?p.id:'ocean'}
 // the player's ride, seen from behind; tilt picks one of five banked frames
-function drawRide3D(g,type,paint,tilt,z){
+function drawRide3D(g,type,paint,tilt,z,fin){
   const S3=84*z,i=Math.max(0,Math.min(4,Math.round(2-(tilt||0)/.3*2)));
   const c=g3cell('r_'+type+'_'+paint,384,i,0,S3*G3DPR());if(!c)return false;
-  g.drawImage(c,-S3/2,-S3*.66,S3,S3);return true}
-function drawRideIcon(g,type,paint,x,y,z){
+  drawFinished(g,c,-S3/2,-S3*.66,S3,S3,fin,S&&S.t);return true}
+function drawRideIcon(g,type,paint,x,y,z,fin){
   const cv=g.canvas,W=cv.width,H=cv.height,S3=Math.min(W*1.3,H*1.3),c=g3cell('r_icons',160,G3PAINTS.indexOf(paint),G3RIDES.indexOf(type),S3);if(!c)return false;
-  g.save();g.setTransform(1,0,0,1,0,0);g.drawImage(c,(W-S3)/2,(H-S3)/2+H*.02,S3,S3);g.restore();return true}
+  g.save();g.setTransform(1,0,0,1,0,0);drawFinished(g,c,(W-S3)/2,(H-S3)/2+H*.02,S3,S3,fin,1.3);g.restore();return true}
 // elite challengers fly the same machines, turned to face you, in their faction's colours
 function drawElite3D(k,fid,vx,x,y,zz){
   const S3=74*zz,i=vx>90?2:vx<-90?0:1,c=g3cell('e_'+fid,320,i,G3RIDES.indexOf(k),S3*G3DPR());if(!c)return false;

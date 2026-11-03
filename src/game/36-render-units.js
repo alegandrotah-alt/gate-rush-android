@@ -390,6 +390,7 @@ function drawBruteLabels(K){
 }
 function sawShape(x,y,r,rot,col){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle=col;ctx.beginPath();for(let j=0;j<16;j++){const rr=j%2?r*.62:r,aa=j*Math.PI/8;ctx.lineTo(Math.cos(aa)*rr,Math.sin(aa)*rr)}ctx.closePath();ctx.fill();ctx.strokeStyle='#1d1a2b';ctx.lineWidth=1.2;ctx.stroke();ctx.fillStyle='#1d1a2b';ctx.beginPath();ctx.arc(0,0,r*.22,0,6.283);ctx.fill();ctx.restore()}
 function drawExtras(K){
+  drawSecretFx(K);
   for(const p of S.trail){const z=sc(p.y)*K,a=Math.min(1,p.t);ctx.fillStyle='rgba(255,140,40,'+(.35*a)+')';ctx.beginPath();ctx.ellipse(px(p.x,p.y),py(p.y),11*z,5*z,0,0,6.283);ctx.fill()}
   for(const k2 of S.kamis){const z=sc(k2.y)*K,x=px(k2.x,k2.y),y=py(k2.y)-10*z;ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(k2.vy,k2.vx));ctx.fillStyle='#1d1a2b';ctx.beginPath();ctx.moveTo(9*z,0);ctx.lineTo(-6*z,-6*z);ctx.lineTo(-3*z,0);ctx.lineTo(-6*z,6*z);ctx.closePath();ctx.fill();ctx.fillStyle='#ff2e63';ctx.beginPath();ctx.arc(-5*z,0,2.5*z*(1+Math.random()*.5),0,6.283);ctx.fill();ctx.restore()}
   for(let i=1;i<srcListCache.length;i++){const w=srcListCache[i],z=sc(w.y)*K,x=px(w.x,w.y),y=py(w.y)-10*z;ctx.fillStyle='#1478a8';ctx.beginPath();ctx.moveTo(x,y-9*z);ctx.lineTo(x+8*z,y+5*z);ctx.lineTo(x-8*z,y+5*z);ctx.closePath();ctx.fill();ctx.fillStyle='#ffd76a';ctx.beginPath();ctx.arc(x,y,2.8*z,0,6.283);ctx.fill()}
@@ -420,8 +421,9 @@ function drawVehicle(K){
   const vx=(c.x-(c.lx??c.x))/Math.max(.008,FRAME_DT);c.lx=c.x;c.tilt=(c.tilt||0)*.85+clamp(vx/900,-.35,.35)*.15;
   ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.55+.15*Math.sin(S.t*20);ctx.drawImage(glowSprite('rgb(80,200,255)'),x-22*z,y-4*z,44*z,22*z);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
   if(S.running&&Math.random()<(LQ()?.25:.7)&&S.sparks.length<250){const tc=cosSel('trail').c;S.sparks.push({x:c.x+(Math.random()-.5)*8,y:c.y+10,vx:(Math.random()-.5)*30,vy:60+Math.random()*60,life:.3,c:tc[(Math.random()*tc.length)|0]})}
+  finishSparks(c);
   if(c.inv>0&&Math.floor(c.inv*20)%2)ctx.globalAlpha=.4;
-  ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y+7*z,21*z,6*z,0,0,6.283);ctx.fill();ctx.save();ctx.translate(x,y-6*z);ctx.rotate(c.tilt*.4);if(FXOK()&&S.running){const f=.75+Math.random()*.5;dspr('jetB',null,-6*z,14*z,6*z,16*z*f,Math.PI,.85,1);dspr('jetB',null,6*z,14*z,6*z,16*z*f,Math.PI,.85,1)}{if(!drawRide3D(ctx,R.veh,g3paint(),c.tilt,z)){const p=paintOf(R.veh);drawVehSpr(ctx,vehSprite(R.veh,p.c,null,0,p.o),z)}}if(FXOK()&&S.running&&!LQ()&&Math.random()<.7)dspr(Math.random()<.5?'muzzle_01':'muzzle_02','#9ff0ff',0,-40*z,12*z,18*z,0,.35+Math.random()*.4,1);ctx.restore();
+  ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y+7*z,21*z,6*z,0,0,6.283);ctx.fill();ctx.save();ctx.translate(x,y-6*z);ctx.rotate(c.tilt*.4);if(FXOK()&&S.running){const f=.75+Math.random()*.5;dspr('jetB',null,-6*z,14*z,6*z,16*z*f,Math.PI,.85,1);dspr('jetB',null,6*z,14*z,6*z,16*z*f,Math.PI,.85,1)}{if(S.odOn&&!LQ()){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.5+.25*Math.sin(S.t*30);ctx.drawImage(glowSprite('rgb(255,150,40)'),-34*z,-50*z,68*z,68*z);ctx.restore()}if(!drawRide3D(ctx,R.veh,g3paint(),c.tilt,z,cosSel('finish').id)){const p=paintOf(R.veh);drawVehSpr(ctx,vehSprite(R.veh,p.c,null,0,p.o),z)}}if(FXOK()&&S.running&&!LQ()&&Math.random()<.7)dspr(Math.random()<.5?'muzzle_01':'muzzle_02','#9ff0ff',0,-40*z,12*z,18*z,0,.35+Math.random()*.4,1);ctx.restore();
   ctx.globalAlpha=1;
   // hitbox dot so you know what can be hit
   ctx.fillStyle='#fff';ctx.strokeStyle='#ff2e63';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y-4*z,Math.max(2.5,S.st.V.hit*.45*z),0,6.283);ctx.fill();ctx.stroke();

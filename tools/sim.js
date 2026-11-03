@@ -11,6 +11,7 @@ const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ?
 const RUNS = +arg('runs', 4);
 const RIDES = arg('rides', 'cannon,jet,tank,saucer,hive,robot').split(',');
 const MAX_MIN = +arg('minutes', 14);
+const ALLSEC = { ghost: 1, abyss: 1, prism: 1, speed: 1, ascetic: 1, edge: 1, sovereign: 1 };
 
 const frag = buildFragment();
 let src = frag.slice(frag.indexOf('<script>') + 8, frag.lastIndexOf('</script>'));
@@ -21,7 +22,7 @@ function mulberry(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0
 const noop = () => {};
 const fake = () => new Proxy(function () {}, { get: (t, p) => p === 'getContext' ? () => fake() : p === 'style' ? { setProperty: noop } : p === 'classList' ? { add: noop, remove: noop, toggle: noop, contains: () => false } : p === 'dataset' ? {} : p === 'clientWidth' ? 400 : p === 'clientHeight' ? 800 : p === 'getBoundingClientRect' ? () => ({ left: 0, top: 0, width: 400, height: 800 }) : (p === 'createLinearGradient' || p === 'createRadialGradient') ? () => ({ addColorStop: noop }) : p === 'firstChild' ? null : p === 'querySelectorAll' ? () => [] : p === 'querySelector' ? () => null : noop, set: () => true, apply: () => fake() });
 
-function runOnce(veh, seed) {
+function runOnce(veh, seed, secrets, give) {
   const rand = mulberry(seed);
   const math = Object.create(Math); math.random = rand;
   let pending = [];
@@ -30,7 +31,7 @@ function runOnce(veh, seed) {
     document: { getElementById: () => fake(), createElement: () => fake(), addEventListener: noop, querySelectorAll: () => [], querySelector: () => fake(), body: fake() },
     window: { addEventListener: noop, devicePixelRatio: 1, matchMedia: () => ({ matches: false }) },
     navigator: {}, location: { search: '' },
-    localStorage: { getItem: (k) => k === 'gaterush-meta2' ? JSON.stringify({ gems: 0, best: 0, shop: {}, veh, tut: 1, rec: { runs: 5, kills: 0, forts: 0, bestHit: 0, bestLvl: 0, biomes: {} }, guide: {} }) : null, setItem: noop, removeItem: noop },
+    localStorage: { getItem: (k) => k === 'gaterush-meta2' ? JSON.stringify({ gems: 0, best: 0, shop: {}, veh, tut: 1, rec: { runs: 5, kills: 0, forts: 0, bestHit: 0, bestLvl: 0, biomes: {} }, guide: {}, secret: secrets ? ALLSEC : {} }) : null, setItem: noop, removeItem: noop },
     performance: { now: () => 0 }, requestAnimationFrame: noop, setTimeout: (f) => { pending.push(f); return 0; }, clearTimeout: noop, setInterval: noop,
     Image: undefined, addEventListener: noop,
   };
@@ -38,6 +39,7 @@ function runOnce(veh, seed) {
   vm.createContext(ctx);
   script.runInContext(ctx);
   const g = ctx.G; g.begin();
+  if (give) { Object.assign(g.R.ups, give); g.restat(); }
   let t = 0; const keeps = []; let died = null, err = null;
   try {
     for (let step = 0; step < 60 * 60 * MAX_MIN; step++) {
@@ -67,22 +69,27 @@ function runOnce(veh, seed) {
       g.update(1 / 60); t += 1 / 60; s.minhp = Math.min(s.minhp ?? 1, c.hp / s.st.maxHp);
     }
   } catch (e) { err = e && e.stack ? e.stack.split('\n').slice(0, 3).join(' | ') : String(e); }
-  return { veh, seed, cleared: keeps.length, died, keeps, err, level: g.R.lvl };
+  return { veh, seed, secrets: !!secrets, give: !!give, cleared: keeps.length, died, keeps, err, level: g.R.lvl };
 }
 
 const results = [];
 const t0 = Date.now();
-for (const veh of RIDES) for (let i = 0; i < RUNS; i++) results.push(runOnce(veh, 1000 + i * 7919 + veh.length * 31));
+// odd-numbered runs have every secret unlocked, so secret weapons and perks show up in the bot's picks
+for (const veh of RIDES) for (let i = 0; i < RUNS; i++) results.push(runOnce(veh, 1000 + i * 7919 + veh.length * 31, i % 2 === 1));
+// crash test: one run with the whole secret arsenal forced in at full power
+const ARSENAL = { blade: 5, riftcut: 1, vortex: 5, horizon: 1, prism: 5, spectrum: 1, overdrive: 3, phase: 3, gatelord: 3, gravity: 3, channel: 3 };
+const arsenal = runOnce('jet', 4242, true, ARSENAL);
 const secs = ((Date.now() - t0) / 1000).toFixed(1);
 
 const rows = RIDES.map((v) => {
   const rs = results.filter((r) => r.veh === v), c = rs.map((r) => r.cleared).sort((a, b) => a - b);
   return { v, avg: (c.reduce((a, b) => a + b, 0) / c.length).toFixed(1), med: c[c.length >> 1], max: c[c.length - 1], k1: rs.filter((r) => r.cleared >= 1).length, n: rs.length, errs: rs.filter((r) => r.err).length };
 });
-const errors = results.filter((r) => r.err);
+const errors = results.concat([arsenal]).filter((r) => r.err);
 const k1 = results.filter((r) => r.cleared >= 1).length / results.length;
 let md = `### Balance simulation\n${results.length} seeded bot runs in ${secs}s (bot steers toward × gates and dodges bullets; it plays worse than a person).\n\n| Ride | Avg keeps cleared | Median | Best | Cleared keep 1 | Crashes |\n|---|---|---|---|---|---|\n`;
 for (const r of rows) md += `| ${r.v} | ${r.avg} | ${r.med} | ${r.max} | ${r.k1}/${r.n} | ${r.errs} |\n`;
+md += `\nSecret arsenal crash test (every secret weapon and perk, maxed): ${arsenal.err ? '**crashed**' : `ran clean, cleared ${arsenal.cleared} keeps`}.\n`;
 const fails = [];
 if (errors.length) fails.push(`${errors.length} run(s) crashed: ${errors[0].veh} seed ${errors[0].seed}: ${errors[0].err}`);
 if (k1 < .5) fails.push(`only ${(k1 * 100).toFixed(0)}% of runs cleared keep 1 (expected at least 50%)`);

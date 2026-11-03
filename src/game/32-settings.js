@@ -18,18 +18,21 @@ function renderSettings(box){
   row('Show FPS',seg('fps',[[0,'Off'],[1,'On']]));
 }
 function cosPreview(cn,kind,item){const g=cn.getContext('2d');if(!g||!g.clearRect)return;g.setTransform(2,0,0,2,0,0);g.clearRect(0,0,cn.width,cn.height);
+  if(item.secret&&!(META.cos[kind]||[]).includes(item.id)){g.setTransform(1,0,0,1,0,0);g.fillStyle='rgba(255,207,46,.85)';g.font='900 34px Orbitron,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('?',cn.width/2,cn.height/2);return}
   if(kind==='paint')drawVehIcon(g,META.veh,32,30,.95,item);
   else if(kind==='blob'){const p3=proj3D(META.veh,item.c,80);if(p3){g.drawImage(p3,4,2,32,32);g.drawImage(p3,32,10,24,24)}else{if(!G3D.st['q_'+META.veh])setTimeout(()=>{try{renderGarage()}catch(e){}},700);g.drawImage(projSprite(META.veh,item.c),10,6,22,25);g.drawImage(projSprite(META.veh,item.c),34,13,16,18)}}
+  else if(kind==='finish'){g.setTransform(1,0,0,1,0,0);
+    if(!drawRideIcon(g,META.veh,g3paint(),0,0,0,item.id)){g.setTransform(2,0,0,2,0,0);drawVehIcon(g,META.veh,32,30,.95,cosSel('paint'))}}
   else{for(let i=0;i<14;i++){g.fillStyle=item.c[i%item.c.length];g.globalAlpha=1-i/14;g.beginPath();g.arc(32+Math.sin(i*.7)*6,6+i*2.6,3.5-i*.18,0,6.283);g.fill()}g.globalAlpha=1}}
 function renderGarage(){
   $('bankG').textContent=META.gems+' gems';
   const box=$('garage');box.innerHTML='';
-  for(const [kind,label] of [['paint','Vehicle paint'],['blob','Shot colour'],['trail','Thruster trail']]){
+  for(const [kind,label] of [['paint','Vehicle paint'],['blob','Shot colour'],['trail','Thruster trail'],['finish','Ride finish']]){
     const sec=document.createElement('div');sec.className='cos';sec.innerHTML=`<h4>${label.toUpperCase()}</h4>`;const grid=document.createElement('div');grid.className='swatches';
-    for(const it of COS[kind]){const own=META.cos[kind].includes(it.id),on=META.sel[kind]===it.id;
-      const b=document.createElement('button');b.type='button';b.className='sw'+(on?' on':'')+(own?'':' locked');b.disabled=!own&&META.gems<it.cost;
-      b.innerHTML=`<canvas width="128" height="88"></canvas><b>${it.name}</b><small>${on?'Equipped':own?'Owned':it.cost+' gems'}</small>`;
-      b.addEventListener('click',()=>{if(!own){if(META.gems<it.cost)return;META.gems-=it.cost;META.cos[kind].push(it.id);achMeta();blip(700,.08,'triangle',.05)}META.sel[kind]=it.id;saveMeta();renderGarage();renderShop()});
+    for(const it of COS[kind]){const own=META.cos[kind].includes(it.id),on=META.sel[kind]===it.id,sec=it.secret&&!own?SECRETS.find(x=>x.id===it.secret):null;
+      const b=document.createElement('button');b.type='button';b.className='sw'+(on?' on':'')+(own?'':' locked')+(it.secret?' secretc':'');b.disabled=!own&&!sec&&META.gems<it.cost;
+      b.innerHTML=`<canvas width="128" height="88"></canvas><b>${sec?'◆ Secret':it.name}</b><small>${on?'Equipped':own?'Owned':sec?'Hidden achievement':it.cost+' gems'}</small>`;
+      b.addEventListener('click',()=>{if(sec){toast(`Secret reward. Hint: “${sec.hint}”`,3200,1);return}if(!own){if(META.gems<it.cost)return;META.gems-=it.cost;META.cos[kind].push(it.id);achMeta();blip(700,.08,'triangle',.05)}META.sel[kind]=it.id;saveMeta();renderGarage();renderShop()});
       grid.appendChild(b);cosPreview(b.querySelector('canvas'),kind,it)}
     sec.appendChild(grid);box.appendChild(sec)}
 }

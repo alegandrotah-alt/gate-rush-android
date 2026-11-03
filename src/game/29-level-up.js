@@ -7,7 +7,7 @@ function evoReady(e){return !lv_(e.id)&&lv_(e.w)>=5&&e.ps.some(p=>lv_(p)>=UPNAME
 function choices(n){
   const evo=EVO.filter(evoReady).map(e=>({...UPNAME[e.id],evo:true}));
   const powMax=lim('overkill')?20:10,si=slotsInfo();
-  const pool=UP.filter(u=>{const l=lv_(u.id);if(l>=(u.id==='power'?powMax:u.max))return false;if(l>0||u.kind==='b')return true;return u.kind==='w'?si.w<si.wMax:si.p<si.pMax});
+  const pool=UP.filter(u=>{if(u.secret&&!secretOwn(u.secret))return false;const l=lv_(u.id);if(l>=(u.id==='power'?powMax:u.max))return false;if(l>0||u.kind==='b')return true;return u.kind==='w'?si.w<si.wMax:si.p<si.pMax});
   const out=evo.slice(0,n);
   const unlocked=R.lvl>=16||EVO.some(e=>lv_(e.id));
   const limits=unlocked?LIM.filter(l=>!lv_(l.id)).map(l=>UPNAME[l.id]):[];
@@ -24,7 +24,7 @@ function synLine(u){
   const tick=id=>lv_(id)?'✓ ':'';
   if(u.evo)return `Evolves ${UPNAME[u.w].name} with ${u.ps.filter(p=>lv_(p)>=UPNAME[p].max).map(p=>UPNAME[p].name).join(' / ')}`;
   if(u.kind==='w')return `Synergy: ${u.syn.map(p=>tick(p)+UPNAME[p].name).join(', ')}. Max this + either one to evolve.`;
-  if(u.kind==='p'){const ws=UP.filter(w=>w.kind==='w'&&w.syn.includes(u.id));return `Synergy: ${ws.map(w=>tick(w.id)+w.name).join(', ')}`}
+  if(u.kind==='p'){const ws=UP.filter(w=>w.kind==='w'&&w.syn.includes(u.id)&&(!w.secret||secretOwn(w.secret)));return ws.length?`Synergy: ${ws.map(w=>tick(w.id)+w.name).join(', ')}`:'Works with every build'}
   if(u.kind==='b')return 'Boost, takes no slot';
   return '';
 }
@@ -49,9 +49,9 @@ function openPick(title){
 function drawPicks(){
   const box=$('picks');box.innerHTML='';
   for(const u of pickSet){
-    const l=lv_(u.id),b=document.createElement('button');b.type='button';b.className='pick'+(u.evo?' evo':u.cat==='lim'?' lim':'');
+    const l=lv_(u.id),b=document.createElement('button');b.type='button';const sec=u.secret||(u.evo&&UPNAME[u.w].secret);b.className='pick'+(u.evo?' evo':u.cat==='lim'?' lim':'')+(sec?' secret':'');
     const kindTxt=u.kind==='w'?'Weapon':u.kind==='p'?'Perk':u.kind==='b'?'Boost':'';
-    const lvlTxt=u.evo?'EVOLUTION':u.cat==='lim'?'LIMIT BREAK':u.max?`${kindTxt} · ${l?`Lv ${l}→${l+1}`:'NEW'}`:'';
+    const lvlTxt=(sec?'◆ SECRET · ':'')+(u.evo?'EVOLUTION':u.cat==='lim'?'LIMIT BREAK':u.max?`${kindTxt} · ${l?`Lv ${l}→${l+1}`:'NEW'}`:'');
     const ty=WTYPE[u.id]||(u.evo?WTYPE[u.w]:null),cl=WCLS[u.id]||(u.evo?WCLS[u.w]:PCLS[u.id])||(u.id==='siphon'||u.id==='guard'?'close':'');
     const sl=synLine(u),desc=typeof u.d==='function'?u.d(l):u.d;
     const tags=[ty?`<i style="font-style:normal;color:${DTC[ty]}">${DTN[ty]}</i>`:'',cl?`<i style="font-style:normal;color:${CLC[cl]}">${CLN[cl]}</i>`:''].filter(Boolean).join(' · ');

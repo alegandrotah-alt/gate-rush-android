@@ -71,6 +71,22 @@ function weaponsTick(o,W){
     blip(1200,.08,'sawtooth',.04)});
   DTY='kin';WCL='eng';// Sentry Turret / Fortress Protocol
   if(st.sentry&&o.main&&cd(tm,'sentry',dt,(st.fortress?3:Math.max(3.4,6.5-.6*st.sentry))*W.CD)){const cap=st.fortress?8:1+st.sentry+(has('vonneumann')?2:0);if(S.sent.length<cap){S.sent.push({x:o.x,y:o.y-12,t:st.fortress?999:12,cd:.2,hp:st.fortress?12:6,re:has('vonneumann')?1:0});blip(500,.06,'square',.03);if(S.sent.length>=6)award('eng6')}}
+  DTY='kin';WCL='close';// Phase Blade / Riftcutter: a sweeping arc that cuts enemies and plain bullets
+  if(st.blade&&cd(tm,'blade',dt,Math.max(.4,1.05-.12*st.blade)*W.CD/(st.riftcut?1.6:1)))fireEv(()=>{
+    const R0=(48+7*st.blade)*RM*(st.riftcut?1.4:1)*(o.main?1:.7),dmg=(2+1.3*st.blade)*P*MM*W.GV*(st.riftcut?2*E:1),side=(tm.bladeSide=-(tm.bladeSide||1)),cy=o.y-10;
+    S.slashes.push({x:o.x,y:cy,r:R0,life:.2,side,rift:!!st.riftcut});
+    for(const e of S.enemies){if(e.w<=0)continue;const dx=e.x-o.x,dy=cy-e.y;if(dy>-12&&dx*dx+dy*dy<(R0+radius(e.w,e.brute))**2)hurt(e,dmg,1)}
+    for(const b of S.bul){if(b.life<=0||(b.hard&&!st.riftcut))continue;const dx=b.x-o.x,dy=cy-b.y;if(dy>-12&&dx*dx+dy*dy<R0*R0){killBullet(b);spark(b.x,b.y,'#bfe8ff',1)}}
+    if(cy-R0<S.fy)fortMelee(dmg*1.5);
+    if(st.riftcut&&S.waves.length<40)S.waves.push({x:o.x,y:cy-14,w:R0*1.1,dmg:dmg*.8,mult:1,mask:0,hit:new Set()});
+    blip(1400,.05,'triangle',.03)});
+  DTY='nrg';WCL='long';// Singularity / Event Horizon
+  if(st.vortex&&cd(tm,'vortex',dt,Math.max(2.4,5.2-.5*st.vortex)*W.CD))fireEv(()=>{const n=st.horizon?2:1;
+    for(let i=0;i<n&&S.voids.length<6;i++){const d=densest()||{x:200,y:S.fy+120},tx=clamp(d.x+(i?(Math.random()<.5?-80:80):0),40,360),ty=clamp(d.y,S.fy+30,Math.max(S.fy+40,o.y-60));
+      S.voids.push({x0:o.x,y0:o.y-14,x:tx,y:ty,t:0,fly:.45,hold:2.2+.25*st.vortex,R:(62+9*st.vortex)*(st.horizon?1.5:1)*(o.main?1:.75),dps:(.9+.55*st.vortex)*P*(st.horizon?2*E:1),blast:(2.4+1.4*st.vortex)*P*(st.horizon?E:1),horizon:!!st.horizon})}
+    blip(120,.2,'sine',.05)});
+  DTY='nrg';WCL='long';// Prism Lance / Spectrum
+  if(st.prism&&cd(tm,'prism',dt,Math.max(.8,2.2-.25*st.prism)*W.CD))fireEv(()=>{if(S.prisms.length<120)S.prisms.push({x:o.x,y:o.y-16,vx:0,vy:-560,dmg:(1.1+.7*st.prism)*P*(st.spectrum?E:1),mult:1,mask:0,hit:new Set(),gen:0,hue:Math.random()*360,spec:!!st.spectrum,life:2});blip(1800,.05,'triangle',.03)});
   DTY='nrg';WCL='close';// Tesla Coil / Arc Reactor
   if(st.tesla&&cd(tm,'tesla',dt,Math.max(.3,1.4-.15*st.tesla)/(st.reactor?2:1)*W.CD))fireEv(()=>{
     const r=(60+8*st.tesla)*(st.reactor?2:1)*(o.main?1:.7),dmg=(.6+.3*st.tesla)*P*(st.reactor?E:1);

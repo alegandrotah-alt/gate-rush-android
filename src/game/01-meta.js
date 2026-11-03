@@ -70,8 +70,9 @@ const COS={
     {id:'royal',name:'Royal',cost:90,c:['#3b2a8f','#7a5cff','#cfc4ff'],o:'#0e0630'},{id:'sunset',name:'Sunset',cost:90,c:['#a84a14','#ff9a3c','#ffe0a3'],o:'#3a1000'},{id:'sakura',name:'Sakura',cost:90,c:['#a83a6a','#ff9ac8','#ffe6f2'],o:'#4a0a2a'},
     {id:'toxic',name:'Toxic',cost:90,c:['#2a4a00','#9aff2a','#eaffb8'],o:'#0a1a00'},{id:'midnight',name:'Midnight Neon',cost:120,c:['#141428','#3a3a6a','#9aa0ff'],o:'#5fe1ff'},{id:'arctic',name:'Arctic',cost:120,c:['#4a6a8a','#e8f4ff','#ffffff'],o:'#1a2a4a'},
     {id:'inferno',name:'Inferno',cost:150,c:['#4a0a00','#ff4a1a','#ffd27a'],o:'#ffcf2e'},{id:'void',name:'Voidglass',cost:180,c:['#05050c','#22223a','#7a5cff'],o:'#ff3df0'},{id:'gold',name:'Gilded',cost:220,c:['#7d5e0c','#e8b923','#fff0a8'],o:'#3a1a00'}],
-  blob:[{id:'aqua',name:'Aqua',cost:0,c:'#2fc4e8'},{id:'lime',name:'Lime',cost:50,c:'#7ad63a'},{id:'bubble',name:'Bubblegum',cost:50,c:'#ff7ac2'},{id:'violet',name:'Violet',cost:80,c:'#9b6bff'},{id:'tang',name:'Tangerine',cost:80,c:'#ff9a3c'},{id:'ghost',name:'Ghost',cost:140,c:'#e6eeff'}],
-  trail:[{id:'spark',name:'Sparks',cost:0,c:['#ffd76a','#8fe7ff']},{id:'fire',name:'Fire',cost:60,c:['#ff7a1a','#ffcf2e','#ff3b3b']},{id:'frost',name:'Frost',cost:60,c:['#bfe8ff','#ffffff']},{id:'shadow',name:'Shadow',cost:100,c:['#3a2a5a','#7a5cff']},{id:'rainbow',name:'Rainbow',cost:180,c:['#ff3b3b','#ffcf2e','#20b46a','#2fc4e8','#9b6bff']}],
+  blob:[{id:'aqua',name:'Aqua',cost:0,c:'#2fc4e8'},{id:'lime',name:'Lime',cost:50,c:'#7ad63a'},{id:'bubble',name:'Bubblegum',cost:50,c:'#ff7ac2'},{id:'violet',name:'Violet',cost:80,c:'#9b6bff'},{id:'tang',name:'Tangerine',cost:80,c:'#ff9a3c'},{id:'ghost',name:'Ghost',cost:140,c:'#e6eeff'},{id:'starlight',name:'Starlight',cost:0,c:'#ffffff',secret:'abyss'},{id:'sovereign',name:'Sovereign Gold',cost:0,c:'#ffd76a',secret:'sovereign'}],
+  trail:[{id:'spark',name:'Sparks',cost:0,c:['#ffd76a','#8fe7ff']},{id:'fire',name:'Fire',cost:60,c:['#ff7a1a','#ffcf2e','#ff3b3b']},{id:'frost',name:'Frost',cost:60,c:['#bfe8ff','#ffffff']},{id:'shadow',name:'Shadow',cost:100,c:['#3a2a5a','#7a5cff']},{id:'rainbow',name:'Rainbow',cost:180,c:['#ff3b3b','#ffcf2e','#20b46a','#2fc4e8','#9b6bff']},{id:'starfall',name:'Starfall',cost:0,c:['#ffffff','#9ad8ff','#ffe9a0'],secret:'speed'},{id:'rift',name:'Void Rift',cost:0,c:['#ff3df0','#7a5cff','#2a0a4a'],secret:'ascetic'},{id:'glitch',name:'Glitch',cost:0,c:['#00ffd0','#ff2e63','#ffffff'],secret:'edge'}],
+  finish:[{id:'none',name:'Standard',cost:0},{id:'spectral',name:'Spectral',cost:0,secret:'ghost'},{id:'prismatic',name:'Prismatic',cost:0,secret:'prism'},{id:'molten',name:'Molten',cost:0,secret:'edge'},{id:'crowned',name:'Crowned',cost:0,secret:'sovereign'}]
 };
 // achievements reward milestones with gems; records track personal bests
 const ACH=[
@@ -149,7 +150,7 @@ function achMeta(){const res=Object.values(META.shop||{}).reduce((a,b)=>a+b,0);i
   const bought=Object.entries(META.cos||{}).reduce((a,[k,v])=>a+v.filter(id=>{const it=(COS[k]||[]).find(x=>x.id===id);return it&&it.cost>0}).length,0);if(bought>=6)award('style6')}
 if(!META.ach)META.ach={};
 if(!META.rec)META.rec={runs:0,kills:0,forts:0,bestHit:0,bestLvl:0,biomes:{}};
-function award(id){if(META.ach[id])return;const a=ACH.find(x=>x.id===id);META.ach[id]=1;META.gems+=a.g;saveMeta();toast(`Achievement: ${a.name}  +${a.g} gems`,2000,1);cue('ach')}
+function award(id){if(META.ach[id])return;const a=ACH.find(x=>x.id===id);META.ach[id]=1;META.gems+=a.g;saveMeta();toast(`Achievement: ${a.name}  +${a.g} gems`,2000,1);cue('ach');sovereignCheck()}
 function checkAch(ev){
   if(!R||!S)return;const rec=META.rec;
   if(ev==='fort'){award('f1');if(S.lv.boss){award('boss');rec.bosses=(rec.bosses||0)+1}if(!S.hitsThisFort){award('clean');rec.flawless=(rec.flawless||0)+1}if(!S.gatesLost){award('hold');R.iron=(R.iron||0)+1;if(R.iron>=5)award('iron5')}
@@ -167,9 +168,11 @@ function checkAch(ev){
   if(R.coins>=40)award('hoard');if(R.coins>=100)award('hoard100');if(R.lvl>=50)award('lvl50');
   rec.biomes[biome().id]=1;if(Object.keys(rec.biomes).length>=6)award('world');
   if(rec.kills+R.kills>=10000)award('k10');
+  secretCheck(ev);
   mileCheck();
 }
 if(!META.cos)META.cos={paint:['ocean'],blob:['aqua'],trail:['spark']};
 if(!META.sel)META.sel={paint:'ocean',blob:'aqua',trail:'spark'};
+if(!META.cos.finish)META.cos.finish=['none'];if(!META.sel.finish)META.sel.finish='none';
 const cosSel=k2=>COS[k2].find(x=>x.id===META.sel[k2])||COS[k2][0];
 

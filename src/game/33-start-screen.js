@@ -1,6 +1,6 @@
 // ---------- start screen ----------
 function renderShop(){
-  mileCheck();
+  mileCheck();sovereignCheck();
   $('bank').textContent=META.gems+' gems';
   const box=$('shop');box.innerHTML='';
   for(const br of ['Offense','Defense','Economy','Arsenal']){

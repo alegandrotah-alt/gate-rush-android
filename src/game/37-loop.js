@@ -29,6 +29,6 @@ function showTab(t){document.querySelectorAll('.tabs button').forEach(b=>{b.clas
 resize();newRun();renderShop();showTab('Play');
 for(let i=0;i<40;i++)spawnPlayer(230+Math.random()*120,300+Math.random()*320,1+Math.random()*30,0);
 // ?debug in the address exposes a few hooks for the automated browser checks
-if(typeof location!=='undefined'&&/[?&]debug\b/.test(location.search))window.__GR={get S(){return S},get R(){return R},startFort,spawnElite,restat};
+if(typeof location!=='undefined'&&/[?&]debug\b/.test(location.search))window.__GR={get S(){return S},get R(){return R},startFort,spawnElite,restat,secretUnlock};
 requestAnimationFrame(frame);
 })();

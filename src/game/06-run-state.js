@@ -29,6 +29,7 @@ function stats(){
     shield:lv_('shield'),aegis:lv_('aegis'),drones:lv_('drones'),hivemind:lv_('hivemind'),
     boomer:lv_('boomer'),glaive:lv_('glaive'),mines:lv_('mines'),minefield:lv_('minefield'),rail:lv_('rail'),massdriver:lv_('massdriver'),tesla:lv_('tesla'),reactor:lv_('reactor'),sentry:lv_('sentry'),fortress:lv_('fortress'),siphon:lv_('siphon'),guard:lv_('guard'),leechCap:(has('vampeng')?val('vampeng')[1]:0)+.02*lv_('siphon'),
     wing:lv_('wing'),kami:lv_('kami'),echo:lv_('echo'),hair:lv_('hair'),ricochet:lv_('ricochet'),channel:lv_('channel'),gravity:lv_('gravity'),absorb:lv_('absorb'),volatile:lv_('volatile'),cryo:lv_('cryo'),burn:lv_('burn'),
+    blade:lv_('blade'),riftcut:lv_('riftcut'),vortex:lv_('vortex'),horizon:lv_('horizon'),prism:lv_('prism'),spectrum:lv_('spectrum'),overdrive:lv_('overdrive'),phase:lv_('phase'),gatelord:lv_('gatelord'),
   };
 }
 function restat(){const before=S.st.maxHp;S.st=stats();S.cannon.hp=Math.min(S.st.maxHp,S.cannon.hp+Math.max(0,S.st.maxHp-before))}
@@ -39,7 +40,7 @@ function startFort(L,fresh){
   const prevF=S&&S.fac;let fc=rnd(FACL);while(fc===prevF)fc=rnd(FACL);
   if(has('alchemy'))for(const g of lv.gates)if(g.t==='add'){const t=has('alchemy');if(t===1)g.v*=2;else{g.t='mul';g.v=t===2?Math.ceil(g.v/2)+1:g.v}}
   S={L,lv,t:0,running:false,over:false,players:[],enemies:[],sparks:[],bolts:[],booms:[],shells:[],bursts:[],
-     bul:[],lasers:[],emit:[],decals:[],vfx:[],props:[],sent:[],tracers:[],orbs:[],arts:[],miss:[],pend:[],charge:0,hitsThisFort:0,sawp:[],traps:[],boomr:[],mine:[],rails:[],pulses:[],kamis:[],trail:[],echoQ:[],beams:[],cones:[],wings:[],caught:0,kamiT:3,trailT:0,burnMineT:0,firedW:0,lastHit:-9,rage:0,pips:0,pipT:0,healLeft:0,
+     bul:[],lasers:[],emit:[],decals:[],vfx:[],props:[],sent:[],tracers:[],orbs:[],arts:[],miss:[],pend:[],charge:0,hitsThisFort:0,sawp:[],traps:[],boomr:[],mine:[],rails:[],pulses:[],kamis:[],trail:[],echoQ:[],beams:[],cones:[],voids:[],prisms:[],slashes:[],waves:[],wings:[],caught:0,kamiT:3,trailT:0,burnMineT:0,firedW:0,lastHit:-9,rage:0,pips:0,pipT:0,healLeft:0,
      baseHP:lv.baseHP,baseMax:lv.baseHP,baseShake:0,fy:BASE_Y,ate:0,streamT:.5,atkT:1.8,
      cannon:{x:200,y:610,tx:200,ty:610,hp:0,cool:0,charge:0,inv:0,tm:{}},
      biome:bm,fac:fc,fw:174,mech:lv.mech||'',eliteT:L===1?15:9+Math.random()*6,shieldUp:false,waveT:5,waveN:0,keys:{},zapT:1,bombT:2,st:stats(),uw:lv.unitW,surge:0,siege:false,bl:0,gz:0,hurtBuff:0,popups:[]};
@@ -168,6 +169,7 @@ const HITGUIDE={mortar:'mortar',laser:'laser',leak:'leak',missile:'missile'};
 function hitTag(src,d){src=src||'bullet';if(src==='mortar')S.mortarHit=1;S.hitTag={t:HITN[src]||src.toUpperCase(),d:Math.round(d),life:1.3};R.hitLog=R.hitLog||{};R.hitLog[src]=(R.hitLog[src]||0)+1;if(HITGUIDE[src])guide(HITGUIDE[src])}
 function hitPlayer(d,src){
   const c=S.cannon;if(c.inv>0||S.over)return;
+  if(S.st.phase&&!(S.phaseT>S.t)){S.phaseT=S.t+[0,9,7,5][S.st.phase];c.inv=.5;popup(c.x,c.y-30,'PHASED','#7fe8ff');vfx({k:'circle_02',x:c.x,y:c.y-4,s0:24,s1:70,dur:.4,col:'#7fe8ff',add:1});blip(1400,.08,'sine',.04);return}
   S.lastHit=S.t;
   if(S.pips>0){S.pips--;c.inv=.35+.08*rank('reflex');popup(c.x,c.y-30,'BLOCKED','#9df0bf');vfx({k:'circle_02',x:c.x,y:c.y-4,s0:30,s1:56,dur:.35,col:'#9df0bf',add:1});if(!playS('block',.6))blip(900,.08,'triangle',.05);return}
   if(S.zone==='close'){d*=(1-(has('thorns')?val('thorns'):0))*(1-.12*S.st.guard);

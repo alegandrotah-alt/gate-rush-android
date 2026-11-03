@@ -107,7 +107,7 @@ function vehSprite(type,pal,glow,mood,outl){const fr=((performance.now()/90)|0)%
   const o=outlineSprite(c0,140,150,3.4,outl||'rgba(4,6,12,.95)');VSPR[key]=o;return o}
 function drawVehSpr(g,sp,z){const q=z/2.4;g.drawImage(sp,-70*q,-98*q,140*q,150*q)}
 function paintOf(type){const p=cosSel('paint');return{c:p.c,o:p.o||(VEHPAL[type]||VEHPAL.cannon).o}}
-function drawVehIcon(g,type,x,y,z,item){if(drawRideIcon(g,type,item&&item.id?item.id:g3paint(),x,y,z))return;const p=item?{c:item.c,o:item.o||VEHPAL[type].o}:paintOf(type);g.save();g.translate(x,y);drawVehSpr(g,vehSprite(type,p.c,null,0,p.o),z);g.restore()}
+function drawVehIcon(g,type,x,y,z,item){if(drawRideIcon(g,type,item&&item.id?item.id:g3paint(),x,y,z,item?null:cosSel('finish').id))return;const p=item?{c:item.c,o:item.o||VEHPAL[type].o}:paintOf(type);g.save();g.translate(x,y);drawVehSpr(g,vehSprite(type,p.c,null,0,p.o),z);g.restore()}
 function grime(g,w,h,seed,light){let s=seed;const r=()=>{s=(s*16807)%2147483647;return s/2147483647};
   g.save();g.globalCompositeOperation='source-atop';
   const sg=g.createLinearGradient(0,h*.25,0,h);sg.addColorStop(0,'rgba(18,12,8,0)');sg.addColorStop(1,`rgba(18,12,8,${light?.3:.5})`);g.fillStyle=sg;g.fillRect(0,0,w,h);

@@ -313,3 +313,13 @@ button:focus-visible{outline:3px solid var(--ally-deep);outline-offset:3px}
 .mile.max{border-color:rgba(255,207,46,.45)}.mile.max .mbar i{background:linear-gradient(90deg,#ffcf2e,#fff0a8)}
 #mileCount,#achCount{font:600 11px Barlow,sans-serif;color:#9fb0c0;letter-spacing:0;margin-left:6px}
 #toast{z-index:40}
+.secrets{display:grid;grid-template-columns:1fr;gap:6px;text-align:left;margin-bottom:10px}
+.secret{border:1px solid rgba(255,207,46,.22);border-radius:8px;padding:8px 10px;background:linear-gradient(180deg,rgba(40,30,8,.35),rgba(10,10,16,.5));display:flex;flex-direction:column;gap:2px}
+.secret b{font-family:Orbitron,var(--display),sans-serif;font-size:12.5px;color:#ffe9a8;letter-spacing:.03em}
+.secret small{font-size:12.5px;color:#cfd8e2;line-height:1.3}.secret small.hint{font-style:italic;color:#d8c48a}
+.secret em{font-style:normal;font-family:Orbitron,sans-serif;font-size:10.5px;color:#9fb0c0;line-height:1.4}
+.secret.got{border-color:rgba(255,207,46,.7);box-shadow:0 0 14px rgba(255,207,46,.18)}.secret.got em{color:#ffcf2e}
+#secCount{font:600 11px Barlow,sans-serif;color:#9fb0c0;letter-spacing:0;margin-left:6px}
+.pick.secret{border-color:#ffcf2e!important;box-shadow:0 0 0 1px rgba(255,207,46,.5),0 0 18px rgba(255,207,46,.25)}
+.pick.secret small{color:#ffcf2e}
+.sw.secretc.locked{border-style:dashed;border-color:rgba(255,207,46,.5)}.sw.secretc b{color:#ffe9a8}

@@ -47,6 +47,7 @@ function update(dt){
         if(isHeld(g))gateCtl(g,.004);
         if(!g.follow){u.gates++;R.gateN=(R.gateN||0)+1;if(TUT)TUT.gate=1}
         if(g.t==='mul'){
+          if(st.gatelord&&!g.follow){g.lordN=(g.lordN||0)+1;if(g.lordN>=[0,60,45,30][st.gatelord]&&(g.lord||0)<st.gatelord){g.lordN=0;g.lord=(g.lord||0)+1;g.bonus=(g.bonus||0)+1;g.flash=.6;popup((g.x1+g.x2)/2+gateX(g),g.y-16,'GATE +1','#ffd76a')}}
           let v=gateMul(g);
           if(has('lucky')){const lv2=val('lucky');if(Math.random()<1/lv2[0]){v=Math.max(v,lv2[1]);popup(u.x,g.y,'LUCKY ×'+lv2[1],'#ffcf2e')}}
           const total=u.w*v;
@@ -187,7 +188,9 @@ function update(dt){
   const P=st.weight*st.shots/st.fireInt*ud,E=st.evoM;
   if(!st.inferno)S.rage=Math.max(0,S.rage-S.rage*.12*dt);if(S.moonDirty){S.moonDirty=0;restat()}
   const PB=lim('pointblank');
-  const W={P,E,dt,CD:1/(1+.2*st.hair)/(S.still>.6&&has('overwatch')?1+val('overwatch'):1),HT:1+.15*st.hair,MM:(1+.025*S.rage)*(has('brawler')?val('brawler'):1)*(PB?3:1),RM:PB?1.5:1,
+  if(st.overdrive){S.odT=(S.odT||0)+dt;const was=S.odOn;S.odOn=S.odT%10<[0,3,4,5][st.overdrive];if(S.odOn&&!was){popup(S.cannon.x,S.cannon.y-50,'OVERDRIVE','#ffb43a');blip(220,.25,'sawtooth',.05)}}else S.odOn=false;
+  const OD=S.odOn?1+[0,.4,.6,.8][st.overdrive]:1;
+  const W={P:P*OD,E,dt,CD:(S.odOn?.5:1)/(1+.2*st.hair)/(S.still>.6&&has('overwatch')?1+val('overwatch'):1),HT:1+.15*st.hair,MM:(1+.025*S.rage)*(has('brawler')?val('brawler'):1)*(PB?3:1),RM:PB?1.5:1,
     CH:[0,.5,.75,1][st.channel],GV:1+.2*st.gravity};
   S.beams=[];S.cones=[];
   for(const src of srcList())weaponsTick(src,W);
@@ -202,6 +205,29 @@ function update(dt){
     if(p.y<S.fy){fortMelee(p.dmg*p.mult*3);p.life=0}
   }
   S.sawp=S.sawp.filter(p=>p.life>0&&p.x>20&&p.x<380);
+  for(const sl of S.slashes)sl.life-=dt;S.slashes=S.slashes.filter(sl=>sl.life>0);
+  DTY='kin';WCL='close';// Riftcutter waves ride your × gates up to the keep
+  for(const w of S.waves){const y0=w.y;w.y-=460*dt;gatePass(w,y0,w.y);
+    for(const e of S.enemies){if(e.w<=0||w.hit.has(e))continue;if(Math.abs(e.x-w.x)<w.w/2+radius(e.w,e.brute)&&Math.abs(e.y-w.y)<14){w.hit.add(e);hurt(e,w.dmg*w.mult,2)}}
+    for(const b of S.bul)if(b.life>0&&Math.abs(b.x-w.x)<w.w/2&&Math.abs(b.y-w.y)<12)killBullet(b);
+    if(w.y<=S.fy){fortMelee(w.dmg*w.mult*3);w.done=1;S.booms.push({x:w.x,y:S.fy,r:26,life:.2})}}
+  S.waves=S.waves.filter(w=>!w.done);
+  DTY='nrg';WCL='long';// singularities: fly in, pull and grind, then collapse
+  for(const v of S.voids){v.t+=dt;if(v.t<v.fly)continue;const R2=v.R;
+    if(v.t<v.fly+v.hold){
+      for(const e of S.enemies){if(e.w<=0)continue;const dx=v.x-e.x,dy=v.y-e.y,d=Math.hypot(dx,dy),rr=R2+radius(e.w,e.brute);if(d<rr){const pull=(e.brute?55:150)*dt*Math.max(.2,1-d/rr);if(d>4){e.x+=dx/d*pull;e.y+=dy/d*pull}hurt(e,v.dps*dt*(d<R2*.35?2:1),2)}}
+      for(const b of S.bul){if(b.life<=0||(b.hard&&!v.horizon))continue;const dx=v.x-b.x,dy=v.y-b.y,d=Math.hypot(dx,dy);if(d<R2){if(d<14)killBullet(b);else{b.x+=dx/d*170*dt;b.y+=dy/d*170*dt}}}}
+    else if(!v.done){v.done=1;S.booms.push({x:v.x,y:v.y,r:R2*.8,life:.35});S.shake=Math.max(S.shake||0,5);playS('boomBig',.5)||blip(60,.25,'sawtooth',.06);let crushed=0;
+      for(const e of S.enemies){if(e.w<=0)continue;const dx=e.x-v.x,dy=e.y-v.y;if(dx*dx+dy*dy<(R2*.8+radius(e.w,e.brute))**2){hurt(e,v.blast,2);if(e.w<=0)crushed+=e.max}}
+      if(v.horizon&&crushed>0)spawnPlayer(v.x,v.y,crushed*.6*E,0)}}
+  S.voids=S.voids.filter(v=>!v.done);
+  DTY='nrg';WCL='long';// prism lances: pierce, and split at every × gate they cross
+  {const born=[];for(const p of S.prisms){const y0=p.y,m0=p.mult;p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;gatePass(p,y0,p.y);
+    if(p.mult>m0&&p.gen<(p.spec?3:2)&&S.prisms.length+born.length<120)for(const s2 of [-1,1]){const a=s2*(p.spec?.2:.28)*(1+p.gen*.3);born.push({x:p.x,y:p.y,vx:Math.sin(a)*560,vy:-Math.cos(a)*560,dmg:p.dmg,mult:p.spec?p.mult:p.mult*.6,mask:p.mask,hit:new Set(p.hit),gen:p.gen+1,hue:p.hue+60*s2,spec:p.spec,life:p.life})}
+    for(const e of S.enemies){if(e.w<=0||p.hit.has(e))continue;if((e.x-p.x)**2+(e.y-p.y)**2<(8+radius(e.w,e.brute))**2){p.hit.add(e);hurt(e,p.dmg*p.mult,2)}}
+    if(p.spec)for(const b of S.bul){if(b.life>0&&!b.hard&&(b.x-p.x)**2+(b.y-p.y)**2<(8+b.r)**2)killBullet(b)}
+    if(p.y<S.fy){fortMelee(p.dmg*p.mult*2);spark(p.x,S.fy,'#ffffff',2);p.life=0}}
+   S.prisms=S.prisms.concat(born).filter(p=>p.life>0&&p.x>20&&p.x<380)}
   DTY='kin';WCL='eng';// saw traps (Minefield)
   for(const tr of S.traps){tr.t-=dt;for(const e of S.enemies){if(e.w>0&&(e.x-tr.x)**2+(e.y-tr.y)**2<(tr.r+radius(e.w,e.brute))**2)hurt(e,tr.dps*dt,1)}for(const b of S.bul){if(b.life>0&&!b.hard&&(b.x-tr.x)**2+(b.y-tr.y)**2<tr.r*tr.r)killBullet(b)}}
   S.traps=S.traps.filter(t=>t.t>0);
