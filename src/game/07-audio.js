@@ -22,7 +22,7 @@ function cue(k){if(playS(CUEMAP[k],.6))return;if(!AC||!SET.sfx)return;const t=AC
 let NB=null;
 function noise(vol,dur,cut){if(!AC)return;if(!NB){NB=AC.createBuffer(1,AC.sampleRate*.5,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
   const now=AC.currentTime,src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();src.buffer=NB;f.type='lowpass';f.frequency.value=cut||1200;g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(.0001,now+dur);src.connect(f).connect(g).connect(MUS.out||AC.destination);src.start(now);src.stop(now+dur+.02)}
-// placeholder music: a small step sequencer in the current biome's key
+// synth-metal music: a small step sequencer in the current biome's key (the fallback and a Settings choice)
 const MUS={gain:null,out:null,next:0,step:0,bar:0,mode:'menu'};
 function musicInit(){
   MUS.gain=AC.createGain();MUS.gain.gain.value=SET.music*.22;
@@ -51,6 +51,7 @@ function timpani(t,f,dest){const o=AC.createOscillator(),g=AC.createGain();o.typ
 // orchestral power metal: i–VI–III–VII in harmonic minor, gallop guitars, double kick, strings, brass, choir
 function musicTick(){
   if(!AC||!MUS.gain)return;
+  if(ostTick()){MUS.gain.gain.setTargetAtTime(0,AC.currentTime,.3);return}
   const target=SET.music*(MUS.mode==='game'?.26:MUS.mode==='pause'?.08:.16);MUS.gain.gain.setTargetAtTime(target,AC.currentTime,.3);
   if(!SET.music)return;
   const b=biome().music,game=MUS.mode==='game',bpm=game?(b.fast?168:152):84,spb=60/bpm/4;

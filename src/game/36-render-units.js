@@ -226,11 +226,7 @@ function render(){
     ctx.beginPath();ctx.moveTo(px(w.x-4,w.y1),py(w.y1)-6*sc(w.y1)*K);ctx.lineTo(px(w.x+4,w.y1),py(w.y1)-6*sc(w.y1)*K);ctx.lineTo(px(w.x+4,w.y2),py(w.y2)-6*sc(w.y2)*K);ctx.lineTo(px(w.x-4,w.y2),py(w.y2)-6*sc(w.y2)*K);ctx.closePath();ctx.fillStyle='#c9c2c6';ctx.fill();
   }
   // enemy lasers (warning, then beam)
-  for(const l of S.lasers){const firing=l.t>l.warn,ly=l.y0??S.fy;
-    const w=firing?l.w:l.w*.35*(l.t/l.warn);
-    ctx.fillStyle=firing?'rgba(255,46,99,.7)':'rgba(255,46,99,'+(.12+.22*(l.t/l.warn))+')';
-    ctx.beginPath();ctx.moveTo(px(l.x-w/2,ly),py(ly));ctx.lineTo(px(l.x+w/2,ly),py(ly));ctx.lineTo(px(l.x+w/2,WH),py(WH));ctx.lineTo(px(l.x-w/2,WH),py(WH));ctx.closePath();ctx.fill();
-    if(firing){ctx.globalCompositeOperation='lighter';ctx.fillStyle='rgba(255,180,200,.9)';ctx.beginPath();ctx.moveTo(px(l.x-w/5,ly),py(ly));ctx.lineTo(px(l.x+w/5,ly),py(ly));ctx.lineTo(px(l.x+w/5,WH),py(WH));ctx.lineTo(px(l.x-w/5,WH),py(WH));ctx.closePath();ctx.fill();ctx.globalCompositeOperation='source-over'}}
+  drawEnemyLasers(K);
   {const c=S.cannon;let ny=-1e9;for(const g of lv.gates)if(!g.dead&&g.y<c.y-6&&g.y>ny)ny=g.y;S.nextG=null;if(ny>-1e9)for(const g of lv.gates){if(g.dead||g.y!==ny)continue;const o=gateX(g);if(c.x>=g.x1+o&&c.x<=g.x2+o){S.nextG=g;break}}}
   const objs=[];for(const g of lv.gates)if(!g.dead)objs.push({y:g.y,g});
   objs.sort((a,b)=>a.y-b.y);
@@ -436,3 +432,33 @@ function drawVehicle(K){
   const p=Math.max(0,c.hp/S.st.maxHp);ctx.strokeStyle=p>.35?'#20b46a':'#ef3b3b';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y-4*z,26*z,Math.PI*.15,Math.PI*.15+Math.PI*.7*p);ctx.stroke();
 }
 
+
+// enemy laser: a charging warning stripe, then a searing beam with a hot core, glow, flare and sparks
+function drawEnemyLasers(K){
+  const quad=(x,w0,w1,y0,y1)=>{ctx.beginPath();ctx.moveTo(px(x-w0/2,y0),py(y0));ctx.lineTo(px(x+w0/2,y0),py(y0));ctx.lineTo(px(x+w1/2,y1),py(y1));ctx.lineTo(px(x-w1/2,y1),py(y1));ctx.closePath()};
+  for(const l of S.lasers){const firing=l.t>l.warn,ly=l.y0??S.fy,z0=sc(ly)*K;
+    if(!firing){const p=l.t/l.warn,pulse=.5+.5*Math.sin(S.t*(12+18*p));
+      ctx.fillStyle=`rgba(255,46,99,${.08+.16*p})`;quad(l.x,l.w*.9,l.w*.9,ly,WH);ctx.fill();
+      // edges and the aim line sharpen as the shot charges
+      ctx.strokeStyle=`rgba(255,90,130,${.35+.5*p})`;ctx.lineWidth=1.2;ctx.setLineDash([10,8]);ctx.lineDashOffset=-S.t*140;
+      for(const sx of [-1,1]){ctx.beginPath();ctx.moveTo(px(l.x+sx*l.w*.45,ly),py(ly));ctx.lineTo(px(l.x+sx*l.w*.45,WH),py(WH));ctx.stroke()}
+      ctx.setLineDash([]);ctx.strokeStyle=`rgba(255,220,230,${.25+.6*p*pulse})`;ctx.lineWidth=1+1.5*p;ctx.beginPath();ctx.moveTo(px(l.x,ly),py(ly));ctx.lineTo(px(l.x,WH),py(WH));ctx.stroke();
+      // charge orb gathering at the emitter
+      const cx=px(l.x,ly),cy=py(ly)-6*z0,R=(6+18*p)*z0;ctx.save();ctx.globalCompositeOperation='lighter';ctx.drawImage(glowSprite('rgb(255,60,110)'),cx-R*1.8,cy-R*1.8,R*3.6,R*3.6);
+      ctx.fillStyle='#ffd6e2';for(let i=0;i<6;i++){const a=i*1.047+S.t*4,rr=R*2.2*(1-((S.t*2+i/6)%1));ctx.fillRect(cx+Math.cos(a)*rr-1,cy+Math.sin(a)*rr*.6-1,2.2,2.2)}
+      ctx.globalAlpha=.6+.4*pulse;ctx.drawImage(glowSprite('rgb(255,220,235)'),cx-R*.6,cy-R*.6,R*1.2,R*1.2);ctx.restore();continue}
+    const ft=l.t-l.warn,grow=Math.min(1,ft/.07),fade=Math.min(1,(l.dur-ft)/.12),k=Math.max(0,grow*fade),fl=1+.12*Math.sin(S.t*60+l.x),w=l.w*k*fl;
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    // wide glow, main beam, white-hot core
+    let g=ctx.createLinearGradient(px(l.x-w*1.4,WH),0,px(l.x+w*1.4,WH),0);g.addColorStop(0,'rgba(255,30,90,0)');g.addColorStop(.5,'rgba(255,40,100,.45)');g.addColorStop(1,'rgba(255,30,90,0)');
+    ctx.fillStyle=g;quad(l.x,w*2.2,w*2.8,ly,WH);ctx.fill();
+    ctx.fillStyle='rgba(255,60,110,.85)';quad(l.x,w,w*1.15,ly,WH);ctx.fill();
+    ctx.fillStyle='rgba(255,236,242,.95)';const cw=w*(.32+.08*Math.sin(S.t*80));quad(l.x,cw,cw*1.1,ly,WH);ctx.fill();
+    // sparks racing down the beam
+    if(!LQ()){ctx.fillStyle='#ffe0ea';for(let i=0;i<8;i++){const ph=(S.t*3+i/8+l.x*.01)%1,yy=ly+(WH-ly)*ph,xx=l.x+Math.sin(i*2.7+S.t*20)*w*.7,zz=sc(yy)*K;ctx.fillRect(px(xx,yy)-1.5*zz,py(yy)-5*zz,3*zz,10*zz)}}
+    // emitter flare
+    const cx=px(l.x,ly),cy=py(ly)-6*z0;if(!dspr('flare_01','#ff4a8a',cx,cy,90*z0*k,90*z0*k,S.t*3,.9,1))ctx.drawImage(glowSprite('rgb(255,80,130)'),cx-30*z0,cy-30*z0,60*z0,60*z0);
+    ctx.restore();
+    // scorch where it sweeps the road
+    if(Math.random()<.5)spark(l.x+(Math.random()-.5)*l.w,ly+Math.random()*(WH-ly),'#ff6a9a',1)}
+}

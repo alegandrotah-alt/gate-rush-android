@@ -4,7 +4,7 @@ function renderSettings(box){
   const row=(label,ctl)=>{const d=document.createElement('div');d.className='set';d.innerHTML=`<b>${label}</b>`;d.appendChild(ctl);box.appendChild(d)};
   const slider=(key,id)=>{const i=document.createElement('input');i.type='range';i.min=0;i.max=1;i.step=.05;i.value=SET[key];i.id=id+box.id;i.setAttribute('aria-label',key);i.addEventListener('input',()=>{SET[key]=+i.value;saveSet();if(key==='sfx')blip(660,.06,'triangle',.05)});return i};
   const seg=(key,opts)=>{const d=document.createElement('div');d.className='seg';for(const [v,l] of opts){const b=document.createElement('button');b.type='button';b.textContent=l;b.className=SET[key]===v?'on':'';b.addEventListener('click',()=>{SET[key]=v;saveSet();renderSettings(box);if(key==='quality'){AUTOLOW=false;resize()}});d.appendChild(b)}return d};
-  row('Music',slider('music','m'));row('Sound effects',slider('sfx','s'));
+  row('Music',slider('music','m'));row('Soundtrack',seg('ost',[['orch','Orchestral'],['synth','Synth metal']]));row('Sound effects',slider('sfx','s'));
   row('Screen shake',seg('shake',[[1,'On'],[.4,'Low'],[0,'Off']]));
   row('Damage numbers',seg('nums',[[1,'On'],[0,'Off']]));
   row('Hitbox ring',seg('hitbox',[[1,'Show'],[0,'Hide']]));

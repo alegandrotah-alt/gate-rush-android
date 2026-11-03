@@ -31,7 +31,7 @@ const saveMeta=()=>{try{localStorage.setItem('gaterush-meta2',JSON.stringify(MET
 const rank=id=>META.shop[id]||0;
 const shopCost=id=>RESN[id].cost[rank(id)]||999;
 const resOpen=r=>!r.req||rank(r.req[0])>=r.req[1];
-let SET={fps:0,autolvl:0,vib:1,fxtext:1,banners:1,music:.5,sfx:.7,shake:1,nums:1,quality:'auto',hitbox:1,contrast:0,flash:1};
+let SET={ost:'orch',fps:0,autolvl:0,vib:1,fxtext:1,banners:1,music:.5,sfx:.7,shake:1,nums:1,quality:'auto',hitbox:1,contrast:0,flash:1};
 try{const m=JSON.parse(localStorage.getItem('gaterush-settings')||'null');if(m)SET=Object.assign(SET,m)}catch(e){}
 const saveSet=()=>{try{localStorage.setItem('gaterush-settings',JSON.stringify(SET))}catch(e){}};
 const LQ=()=>SET.quality==='low'||(SET.quality==='auto'&&AUTOLOW);

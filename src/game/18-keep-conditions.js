@@ -58,7 +58,7 @@ function modsTick(dt){
     for(const u of S.players){if(!u.big&&u.w>0&&u.py>b.y&&u.y<=b.y&&Math.abs(u.x-b.x)<b.w/2){u.w=0;if(Math.random()<.15)spark(u.x,b.y,'#ff5a7a',1)}}}
   if(hasMod('meteors')){md.mt2=(md.mt2??3)-dt;
     if(md.mt2<=0){md.mt2=Math.max(1.6,3.4-.08*S.L);const near=Math.random()<.45,x=near?clamp(c.x+(Math.random()-.5)*80,36,364):36+Math.random()*328,y=near?clamp(c.y+(Math.random()-.5)*60,S.fy+60,Y_MAX):S.fy+70+Math.random()*(Y_MAX-S.fy-80);md.met.push({x,y,t:0,dur:1.6})}
-    for(const m of md.met){m.t+=dt;if(m.t>=m.dur&&!m.done){m.done=1;S.booms.push({x:m.x,y:m.y,r:42,life:.4});S.shake=Math.max(S.shake||0,6);playS('crunch',.7)||blip(50,.3,'sawtooth',.07);sfxText(m.x,m.y-12,'KRAK!','#ffb43a');
+    for(const m of md.met){m.t+=dt;if(m.t>=m.dur&&!m.done){m.done=1;meteorImpact(m);
       if(Math.hypot(c.x-m.x,c.y-m.y)<36+st.V.hit*.5)hitPlayer(bulletDmg()*1.8,'meteor');for(const u of S.players)if(!u.big&&(u.x-m.x)**2+(u.y-m.y)**2<36*36)u.w=0;
       DTY='exp';WCL='';for(const e of S.enemies)if(e.w>0&&!e.pylon&&(e.x-m.x)**2+(e.y-m.y)**2<(40+radius(e.w,e.brute))**2)hurt(e,e.elite?e.max*.15:e.w*3,0)}}
     md.met=md.met.filter(m=>!m.done)}
@@ -83,9 +83,8 @@ function drawModsGround(K){
   if(md.bar){const b=md.bar,z=sc(b.y)*K,y=py(b.y),x1=px(b.x-b.w/2,b.y),x2=px(b.x+b.w/2,b.y),h=24*z;
     ctx.fillStyle=`rgba(255,50,90,${.32+.1*Math.sin(S.t*10)})`;ctx.fillRect(x1,y-h,x2-x1,h);ctx.fillStyle='rgba(255,200,220,.28)';for(let i=0;i<5;i++)ctx.fillRect(x1,y-h+((S.t*30*z+i*h/5)%h),x2-x1,Math.max(1,z));
     ctx.strokeStyle='rgba(255,140,170,.95)';ctx.lineWidth=2;ctx.strokeRect(x1,y-h,x2-x1,h);for(const ex of [x1,x2])cylG(ctx,ex-3.5*z,y-h-6*z,7*z,h+7*z,'#4a3038')}
-  for(const m of md.met){const p=m.t/m.dur,z=sc(m.y)*K,x=px(m.x,m.y),y=py(m.y);
-    if(!dspr('xhair',null,x,y,72*z,28*z,0,.4+.6*p)){ctx.strokeStyle=`rgba(255,170,60,${.4+.6*p})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,36*z,13*z,0,0,6.283);ctx.stroke()}ctx.fillStyle=`rgba(255,120,40,${.1+.25*p})`;ctx.beginPath();ctx.ellipse(x,y,36*z*p,13*z*p,0,0,6.283);ctx.fill();
-    const fy2=y-(1-p)*H*.6,fx=x+(1-p)*70;ctx.strokeStyle='rgba(255,170,80,.55)';ctx.lineWidth=6*z;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(fx+40,fy2-70);ctx.lineTo(fx,fy2);ctx.stroke();ctx.lineCap='butt';if(!(FXOK()&&dspr('fire_01','#ff7a2a',fx+8*z,fy2-12*z,22*z,30*z,-.5,.8,1)&&dspr(m.k||(m.k=rnd(['metB1','metB3','metG1','metG4'])),null,fx,fy2,22*z+4,22*z+4,S.t*3+m.x))){sph(ctx,fx,fy2,8*z+2,'#5a4030');glowDot(ctx,fx,fy2+3*z,4*z,'#ff8a3a')}}
+  for(const m of md.met)drawMeteor(m,K);
+  drawMeteorDebris(K);
   if(md.wp){const dir=md.wdir,gust=md.wp==='gust';ctx.save();
     if(gust){ctx.globalAlpha=.45;ctx.fillStyle='#e8dcc8';for(let i=0;i<34;i++){const yy=(i*67.3)%H,xx=(((i*131+S.t*900*dir)%(W+200))+W+200)%(W+200)-100;ctx.fillRect(xx,yy,40+(i%3)*24,1.5)}}
     else{ctx.globalAlpha=.4+.4*Math.sin(S.t*14);ctx.fillStyle='#ffb43a';ctx.font=`900 ${Math.min(44,W*.11)}px Orbitron,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=5;ctx.strokeStyle='#000';const t=dir>0?'>>>  WIND  >>>':'<<<  WIND  <<<';ctx.strokeText(t,W/2,H*.56);ctx.fillText(t,W/2,H*.56)}
@@ -111,3 +110,51 @@ function drawBlackout(){
   hole(px(200,S.fy),py(S.fy)-10,gw*.45,.45);
   ctx.drawImage(DARK,0,0,W,H);
 }
+
+// ---------- meteors: a burning rock on a steep dive, with a flame tail, smoke and embers; the impact throws debris ----------
+function meteorImpact(m){
+  S.booms.push({x:m.x,y:m.y,r:46,life:.45});S.shake=Math.max(S.shake||0,9);buzz(30);
+  playS('boomBig',.55,.8+Math.random()*.15);playS('crunch',.6)||blip(50,.3,'sawtooth',.07);sfxText(m.x,m.y-12,'KRAK!','#ffb43a');
+  vfx({k:'circle_05',x:m.x,y:m.y,s0:20,s1:150,dur:.5,col:'#c8a888',a0:.7,flat:1});
+  vfx({k:'light_01',x:m.x,y:m.y-6,s0:60,s1:110,dur:.25,col:'#ffd8a0',add:1});
+  vfx({k:'light_01',x:m.x,y:m.y,s0:70,s1:60,dur:1.6,col:'#ff5a14',a0:.55,add:1,flat:1});
+  if(S.decals&&S.decals.length<40)S.decals.push({k:'scorch_01',x:m.x,y:m.y,s:96,a:.75,rot:Math.random()*6,t:12,glow:1});
+  const md=S.md;md.deb=md.deb||[];
+  for(let i=0;i<(LQ()?6:12)&&md.deb.length<60;i++){const a=Math.random()*6.283,sp=60+Math.random()*120;md.deb.push({x:m.x,y:m.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp*.5,h:4,vh:120+Math.random()*160,r:2+Math.random()*3.5,rot:Math.random()*6,vr:(Math.random()-.5)*14,life:1.1+Math.random()*.5,hot:Math.random()<.5})}
+}
+function meteorPos(m,K){const p=Math.min(1,m.t/m.dur),e=p*p,x=px(m.x,m.y),y=py(m.y),z=sc(m.y)*K;return{p,e,z,x,y,hx:x+(1-e)*150*K,hy:y-(1-e)*430*K-12*z}}
+function drawMeteor(m,K){
+  const {p,z,x,y,hx,hy}=meteorPos(m,K);
+  // the landing zone: shadow grows and darkens as the rock nears, ring fills up
+  ctx.fillStyle=`rgba(0,0,0,${.1+.35*p})`;ctx.beginPath();ctx.ellipse(x,y,(8+26*p)*z,(3+10*p)*z,0,0,6.283);ctx.fill();
+  if(!dspr('xhair',null,x,y,72*z,28*z,0,.45+.55*p)){ctx.strokeStyle=`rgba(255,170,60,${.4+.6*p})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,36*z,13*z,0,0,6.283);ctx.stroke()}
+  ctx.fillStyle=`rgba(255,110,30,${.12+.28*p})`;ctx.beginPath();ctx.ellipse(x,y,36*z*p,13*z*p,0,0,6.283);ctx.fill();
+  if(p>.7){ctx.strokeStyle=`rgba(255,${200+55*Math.sin(S.t*30)|0},120,.9)`;ctx.lineWidth=Math.max(2,3*z);ctx.beginPath();ctx.ellipse(x,y,38*z,14*z,0,0,6.283);ctx.stroke()}
+  const rr=(10+10*p)*z+3,dx=x-hx,dy=y-12*z-hy,ang=Math.atan2(dy,dx),tail=ang+Math.PI,Lt=rr*(6.5-1.5*p);
+  // smoke left behind (screen space, render clock)
+  m.sm=m.sm||[];if(!LQ()&&FXOK()){m.smT=(m.smT||0)-FRAME_DT;if(m.smT<=0){m.smT=.035;m.sm.push({x:hx-Math.cos(ang)*rr*2,y:hy-Math.sin(ang)*rr*2,a:1,s:rr*1.6})}}
+  for(const q of m.sm){q.a-=FRAME_DT*1.6;q.s+=FRAME_DT*rr*3;if(q.a>0)dspr('smoke_04','#3a302c',q.x,q.y,q.s,q.s,q.x,q.a*.55)}m.sm=m.sm.filter(q=>q.a>0);
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  ctx.drawImage(glowSprite('rgb(255,120,40)'),hx-rr*3,hy-rr*3,rr*6,rr*6);
+  // flame tail: an outer orange plume and a white-hot core, flickering
+  ctx.translate(hx,hy);ctx.rotate(tail);const f1=1+.12*Math.sin(S.t*37+m.x),f2=1+.12*Math.sin(S.t*29+m.y);
+  let g=ctx.createLinearGradient(0,0,Lt,0);g.addColorStop(0,'rgba(255,214,120,.95)');g.addColorStop(.22,'rgba(255,128,36,.75)');g.addColorStop(.6,'rgba(210,44,14,.35)');g.addColorStop(1,'rgba(120,20,10,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(-rr*.7,0);ctx.quadraticCurveTo(-rr*.5,-rr*1.3,rr*.9,-rr*1.15*f1);ctx.quadraticCurveTo(Lt*.45,-rr*.75*f2,Lt*f1,0);ctx.quadraticCurveTo(Lt*.45,rr*.75*f1,rr*.9,rr*1.15*f2);ctx.quadraticCurveTo(-rr*.5,rr*1.3,-rr*.7,0);ctx.fill();
+  g=ctx.createLinearGradient(0,0,Lt*.55,0);g.addColorStop(0,'rgba(255,255,235,.95)');g.addColorStop(.4,'rgba(255,220,120,.6)');g.addColorStop(1,'rgba(255,160,60,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(-rr*.3,0);ctx.quadraticCurveTo(0,-rr*.7,rr*.8,-rr*.55);ctx.quadraticCurveTo(Lt*.3,-rr*.3,Lt*.55*f2,0);ctx.quadraticCurveTo(Lt*.3,rr*.3,rr*.8,rr*.55);ctx.quadraticCurveTo(0,rr*.7,-rr*.3,0);ctx.fill();
+  // embers peeling off the tail
+  for(let i=0;i<(LQ()?2:5);i++){const ph=((S.t*2.2+i*.21+m.x*.01)%1),ex=rr+ph*Lt*1.1,ey=Math.sin(i*2.4+S.t*9)*rr*(.4+ph);ctx.globalAlpha=1-ph;ctx.fillStyle=i%2?'#ffd27a':'#ff7a2a';ctx.fillRect(ex,ey,2.4*z+1,2.4*z+1)}
+  ctx.restore();
+  // the rock itself, tumbling
+  const fr=((S.t*14+m.x)|0)%8,S3=rr*2.7,c=g3cell('meteor3d',192,fr,0,S3*G3DPR());
+  if(c)ctx.drawImage(c,hx-S3/2,hy-S3/2,S3,S3);else if(!dspr(m.k||(m.k=rnd(['metB1','metB3','metG1','metG4'])),null,hx,hy,rr*2.2,rr*2.2,S.t*3+m.x)){sph(ctx,hx,hy,rr,'#5a4030')}
+  // heat on the leading edge
+  ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.75;ctx.drawImage(glowSprite('rgb(255,200,120)'),hx+Math.cos(ang)*rr*.55-rr,hy+Math.sin(ang)*rr*.55-rr,rr*2,rr*2);ctx.restore();
+}
+function drawMeteorDebris(K){const md=S.md;if(!md||!md.deb||!md.deb.length)return;const dt=FRAME_DT;
+  for(const d of md.deb){d.life-=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vh-=520*dt;d.h+=d.vh*dt;d.rot+=d.vr*dt;if(d.h<0){d.h=0;d.vh*=-.35;d.vx*=.6;d.vy*=.6;d.vr*=.6}
+    const z=sc(d.y)*K,x=px(d.x,d.y),y=py(d.y),r=d.r*z+1,a=Math.min(1,d.life*2);
+    ctx.globalAlpha=a*.35;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(x,y,r,r*.4,0,0,6.283);ctx.fill();ctx.globalAlpha=a;
+    ctx.save();ctx.translate(x,y-d.h*z);ctx.rotate(d.rot);ctx.fillStyle=d.hot?'#c8501e':'#4a3a30';ctx.beginPath();ctx.moveTo(-r,-r*.4);ctx.lineTo(-r*.2,-r);ctx.lineTo(r,-r*.3);ctx.lineTo(r*.6,r*.8);ctx.lineTo(-r*.7,r*.6);ctx.closePath();ctx.fill();
+    if(d.hot){ctx.fillStyle='#ffc070';ctx.fillRect(-r*.3,-r*.3,r*.6,r*.6)}ctx.restore()}
+  ctx.globalAlpha=1;md.deb=md.deb.filter(d=>d.life>0)}
